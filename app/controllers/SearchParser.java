@@ -1,5 +1,6 @@
 package controllers;
 
+
 /**
  * The searchParser class is related to send by the client in order to search on the database
  * @author Marie-Elise Lecoq
