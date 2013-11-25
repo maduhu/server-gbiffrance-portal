@@ -14,7 +14,6 @@ public class Search extends Controller {
 
 	@With(CorsWrapper.class)
 	public static Result index() {
-		System.out.println("plooooooooooooop");
 		JsonNode json = request().body().asJson();
 		ObjectMapper mapper = new ObjectMapper();	 
 		try { 
@@ -22,10 +21,10 @@ public class Search extends Controller {
 			SearchParser search = mapper.readValue(json.traverse(), SearchParser.class);	 
 			// display to console
 			for(int k=0; k<search.getScientificName().length; k++){
-//				if(!search.getScientificName()[k].equals(null)){
-//					return ok(json);
-//				}
-				System.out.println("Scientific name = " + search.getScientificName()[k]);
+				if(!search.getScientificName()[k].equals(null)){
+					return ok(json);
+				}
+//				System.out.println("Scientific name = " + search.getScientificName()[k]);
 			}
 				
 			

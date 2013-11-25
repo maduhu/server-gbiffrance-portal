@@ -2,8 +2,8 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-OPTIONS  /api/                      controllers.Cors.cors()
-GET      /api/search                controllers.Search.index()
+OPTIONS  /api/search                      controllers.Cors.cors()
+#GET      /api/search                controllers.Search.index()
 POST     /api/search                controllers.Search.index()
 
 # Map static resources from the /public folder to the /assets URL path
