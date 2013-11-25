@@ -14,14 +14,21 @@ public class Search extends Controller {
 
 	@With(CorsWrapper.class)
 	public static Result index() {
+		System.out.println("plooooooooooooop");
 		JsonNode json = request().body().asJson();
 		ObjectMapper mapper = new ObjectMapper();	 
 		try { 
 			// read from file, convert it to user class
 			SearchParser search = mapper.readValue(json.traverse(), SearchParser.class);	 
 			// display to console
-			for(int k=0; k<search.getScientificName().length; k++)
+			for(int k=0; k<search.getScientificName().length; k++){
+//				if(!search.getScientificName()[k].equals(null)){
+//					return ok(json);
+//				}
 				System.out.println("Scientific name = " + search.getScientificName()[k]);
+			}
+				
+			
 		} catch (JsonGenerationException e) {
 			e.printStackTrace();
 		} catch (JsonMappingException e) {

@@ -9,5 +9,6 @@ public class CorsWrapper extends play.mvc.Action.Simple {
         ctx.response().setHeader("Access-Control-Allow-Origin", "*");
         ctx.response().setHeader("Access-Control-Allow-Headers", "Content-Type");
         return delegate.call(ctx);
-    }
+    }  
 }
+
