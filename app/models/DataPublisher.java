@@ -56,6 +56,14 @@ public class DataPublisher {
 	 * the data publisher image URL
 	 */
 	private String imageURL;
+	
+	public DataPublisher(Long id){
+		this.id = id;
+	}
+
+	public DataPublisher() {
+		// TODO Auto-generated constructor stub
+	}
 
 	// Getter and setter of the DataPublisher Model
 	public Long getId() {

@@ -9,6 +9,7 @@ import org.elasticsearch.search.SearchHit;
 
 import com.github.cleverage.elasticsearch.IndexClient;
 
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.With;
@@ -18,12 +19,6 @@ public class DataPublisherController extends Controller {
 	@SuppressWarnings("unchecked")
 	@With(CorsWrapper.class)
 	public static Result searchAll() {
-
-//		 GetResponse response =
-//		 IndexClient.client.prepareGet("gbiffrance-harvest", "DataPublisher",
-//		 "3")
-//		 .execute()
-//		 .actionGet();
 
 		SearchResponse response = IndexClient.client
 				.prepareSearch("gbiffrance-harvest")
@@ -37,8 +32,8 @@ public class DataPublisherController extends Controller {
 
 		for (SearchHit hit : response.getHits()) {
 			DataPublisher dataPublisher = new DataPublisher();
-//			dataPublisher.setId(hit.getSource()
-//					.get("_id").);
+			dataPublisher.setId(Long.parseLong((String) hit.getSource()
+					.get("_id")));
 			dataPublisher.setClassName((String) hit.getSource()
 					.get("className"));
 			dataPublisher.setName((String) hit.getSource()
@@ -54,7 +49,7 @@ public class DataPublisherController extends Controller {
 			dataPublisherList.add(dataPublisher);
 		}
 		
-		return ok(nbHits.toString());
+		return ok(Json.toJson(dataPublisherList));
 //		return ok(Response.toString());
 	}
 
