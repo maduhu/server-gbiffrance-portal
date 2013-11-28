@@ -1,3 +1,4 @@
+
 package controllers;
 
 import java.util.ArrayList;
@@ -6,6 +7,9 @@ import models.Dataset;
 import models.Occurrence;
 
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.MatchQueryBuilder.Type;
 import org.elasticsearch.search.SearchHit;
 
 import play.libs.Json;
@@ -16,6 +20,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.cleverage.elasticsearch.IndexClient;
 
 public class Occurrences extends Controller {
+	
+	private enum Rank {
+		KINGDOM, PHYLUM, CLASS, ORDER, FAMILY, GENUS, SPECIES, SUBSPECIES
+	}
 	
 	private static Occurrence createJson(SearchHit hit){
 		Occurrence occurrence = new Occurrence();
@@ -122,15 +130,90 @@ public class Occurrences extends Controller {
 		return ok(Json.toJson(occurrenceList));
 	}
 	
-	 public JsonNode SearchRequest(SearchParser search){
-		 SearchResponse response = IndexClient.client
-					.prepareSearch("gbiffrance-harvest")
-					.setTypes("Occurrence")
-					.execute().actionGet();
-			ArrayList<Occurrence> occurrenceList = new ArrayList<Occurrence>();
-			for (SearchHit hit : response.getHits())
-				occurrenceList.add(createJson(hit));
-			return Json.toJson(occurrenceList);
-	 }
+	public static BoolQueryBuilder buildRequest(SearchParser search){
+		
+		BoolQueryBuilder taxaQuery = new BoolQueryBuilder();
+		
+		if(!search.getScientificNames().isEmpty()){
+			for(int i=0; i< search.getScientificNames().size(); ++i){
+				Rank rank = Rank.valueOf(search.getScientificNames().get(i).getRank());
+				switch (rank) {
+					case KINGDOM:
+						taxaQuery = QueryBuilders.boolQuery()
+										.should(QueryBuilders.matchQuery("kingdom_interpreted", search.getScientificNames().get(i).getScientificName()))
+										.should(QueryBuilders.matchQuery("kingdom", search.getScientificNames().get(i).getScientificName()));
+						break;
+					case PHYLUM:
+						taxaQuery = QueryBuilders.boolQuery()
+										.should(QueryBuilders.matchQuery("phylum_interpreted", search.getScientificNames().get(i).getScientificName()))
+										.should(QueryBuilders.matchQuery("phylum", search.getScientificNames().get(i).getScientificName()));
+						break;
+					case CLASS:
+						taxaQuery = QueryBuilders.boolQuery()
+										.should(QueryBuilders.matchQuery("classs_interpreted", search.getScientificNames().get(i).getScientificName()))
+										.should(QueryBuilders.matchQuery("classs", search.getScientificNames().get(i).getScientificName()));
+						break;
+					case ORDER:
+						taxaQuery = QueryBuilders.boolQuery()
+										.should(QueryBuilders.matchQuery("orderr_interpreted", search.getScientificNames().get(i).getScientificName()))
+										.should(QueryBuilders.matchQuery("orderr", search.getScientificNames().get(i).getScientificName()));
+						break;
+					case FAMILY:
+						taxaQuery = QueryBuilders.boolQuery()
+										.should(QueryBuilders.matchQuery("family_interpreted", search.getScientificNames().get(i).getScientificName()))
+										.should(QueryBuilders.matchQuery("family", search.getScientificNames().get(i).getScientificName()));
+						break;
+					case GENUS:
+						taxaQuery = QueryBuilders.boolQuery()
+										.should(QueryBuilders.matchQuery("genus_interpreted", search.getScientificNames().get(i).getScientificName()))
+										.should(QueryBuilders.matchQuery("genus", search.getScientificNames().get(i).getScientificName()));
+						break;
+					case SPECIES:
+						taxaQuery = QueryBuilders.boolQuery()
+										.should((QueryBuilders.matchQuery("scientificName", search.getScientificNames().get(i).getScientificName())).type(Type.PHRASE_PREFIX).analyzer("simple"))
+										.should(QueryBuilders.matchQuery("specificEpithet_interpreted", search.getScientificNames().get(i).getScientificName()).type(Type.PHRASE_PREFIX).analyzer("simple"));
+						break;
+					case SUBSPECIES:
+						taxaQuery = QueryBuilders.boolQuery()
+										.should((QueryBuilders.matchQuery("scientificName", search.getScientificNames().get(i).getScientificName())).type(Type.PHRASE_PREFIX).analyzer("simple"))
+										.should(QueryBuilders.matchQuery("specificEpithet_interpreted", search.getScientificNames().get(i).getScientificName()).type(Type.PHRASE_PREFIX).analyzer("simple"));
+						break;
+					default:
+						taxaQuery = QueryBuilders.boolQuery()
+										.should((QueryBuilders.matchQuery("scientificName", search.getScientificNames().get(i).getScientificName())).type(Type.PHRASE_PREFIX).analyzer("simple"))
+										.should(QueryBuilders.matchQuery("specificEpithet_interpreted", search.getScientificNames().get(i).getScientificName()).type(Type.PHRASE_PREFIX).analyzer("simple"));
+						break;
+				}
+			}
+		}
+		
+		
+		System.out.print(taxaQuery);
+		return taxaQuery;
+		
+	}
+	
+	
+	/**
+	 * Fonction qui lance la requete sur ElasticSearch
+	 * @param search
+	 * @return
+	 */
+	public JsonNode SearchRequest(SearchParser search) {
+		
+		BoolQueryBuilder searchRequest = buildRequest(search);
+		
+		SearchResponse response = IndexClient.client
+				.prepareSearch("gbiffrance-harvest").setTypes("Occurrence")
+				.setQuery(searchRequest)
+				.execute().actionGet();
+		ArrayList<Occurrence> occurrenceList = new ArrayList<Occurrence>();
+		Long nbrResultat = response.getHits().getTotalHits();
+		System.out.println(response);
+		for (SearchHit hit : response.getHits())
+			occurrenceList.add(createJson(hit));
+		return Json.toJson(occurrenceList);
+	}
+	
 
 }

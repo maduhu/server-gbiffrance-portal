@@ -28,7 +28,7 @@ public class Search extends Controller {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return ok("blblbl");
+		return ok("bla");
 	}
 
 }
