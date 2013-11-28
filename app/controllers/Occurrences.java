@@ -122,7 +122,7 @@ public class Occurrences extends Controller {
 		return ok(Json.toJson(occurrenceList));
 	}
 	
-	 public JsonNode SearchEngineRequest(SearchParser search){
+	 public JsonNode SearchRequest(SearchParser search){
 		 SearchResponse response = IndexClient.client
 					.prepareSearch("gbiffrance-harvest")
 					.setTypes("Occurrence")

@@ -19,7 +19,7 @@ public class Search extends Controller {
 		ObjectMapper mapper = new ObjectMapper();	 
 		try { 
 			SearchParser search = mapper.readValue(json.traverse(), SearchParser.class);
-			JsonNode jsonResult = occurrenceCtrl.SearchEngineRequest(search);	
+			JsonNode jsonResult = occurrenceCtrl.SearchRequest(search);	
 			return ok(jsonResult);
 		} catch (JsonGenerationException e) {
 			e.printStackTrace();
