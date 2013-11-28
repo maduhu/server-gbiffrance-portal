@@ -12,9 +12,10 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.github.cleverage.elasticsearch.IndexClient;
 
-public class OccurrenceController extends Controller {
+public class Occurrences extends Controller {
 	
 	private static Occurrence createJson(SearchHit hit){
 		Occurrence occurrence = new Occurrence();
@@ -106,19 +107,30 @@ public class OccurrenceController extends Controller {
 				.get("datasetId"))));
 		return occurrence;
 	}
+	
+	/**
+	 * Function that return all the occurrence documents stored in our ElasticSearch 
+	 * @return result JSON
+	 */
 	public static Result searchAll() {
-
 		SearchResponse response = IndexClient.client
-				.prepareSearch("gbiffrance-harvest")
-				.setTypes("Occurrence")
-				.execute()
-				.actionGet();
-		
+				.prepareSearch("gbiffrance-harvest").setTypes("Occurrence")
+				.execute().actionGet();
 		ArrayList<Occurrence> occurrenceList = new ArrayList<Occurrence>();
-		for (SearchHit hit : response.getHits()) 
+		for (SearchHit hit : response.getHits())
 			occurrenceList.add(createJson(hit));
-		
 		return ok(Json.toJson(occurrenceList));
 	}
+	
+	 public JsonNode SearchEngineRequest(SearchParser search){
+		 SearchResponse response = IndexClient.client
+					.prepareSearch("gbiffrance-harvest")
+					.setTypes("Occurrence")
+					.execute().actionGet();
+			ArrayList<Occurrence> occurrenceList = new ArrayList<Occurrence>();
+			for (SearchHit hit : response.getHits())
+				occurrenceList.add(createJson(hit));
+			return Json.toJson(occurrenceList);
+	 }
 
 }

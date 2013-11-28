@@ -14,7 +14,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.With;
 
-public class DataPublisherController extends Controller {
+public class DataPublishers extends Controller {
 
 	@SuppressWarnings("unchecked")
 	@With(CorsWrapper.class)

@@ -13,18 +13,14 @@ import play.mvc.*;
 public class Search extends Controller {
 
 	@With(CorsWrapper.class)
-	public static Result index() {
+	public static Result searchOccurrences() {
+		Occurrences occurrenceCtrl = new Occurrences();
 		JsonNode json = request().body().asJson();
 		ObjectMapper mapper = new ObjectMapper();	 
 		try { 
-			SearchParser search = mapper.readValue(json.traverse(), SearchParser.class);	 
-			for(int k=0; k<search.getScientificName().length; k++){
-				if(!search.getScientificName()[k].equals(null)){
-					return ok(json);
-				}
-			}
-				
-			
+			SearchParser search = mapper.readValue(json.traverse(), SearchParser.class);
+			JsonNode jsonResult = occurrenceCtrl.SearchEngineRequest(search);	
+			return ok(jsonResult);
 		} catch (JsonGenerationException e) {
 			e.printStackTrace();
 		} catch (JsonMappingException e) {

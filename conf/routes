@@ -4,10 +4,10 @@
 
 OPTIONS  /api/search                controllers.Cors.cors()
 #GET     /api/search                controllers.Search.index()
-POST     /api/search                controllers.Search.index()
-GET 	 /api/datapublisher			controllers.DataPublisherController.searchAll()
-GET 	 /api/dataset				controllers.DatasetController.searchAll()
-GET		 /api/occurrence			controllers.OccurrenceController.searchAll()
+POST     /api/search                controllers.Search.searchOccurrences()
+GET 	 /api/datapublisher			controllers.DataPublishers.searchAll()
+GET 	 /api/dataset				controllers.Datasets.searchAll()
+GET		 /api/occurrence			controllers.Occurrences.searchAll()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
