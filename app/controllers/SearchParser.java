@@ -54,6 +54,16 @@ public class SearchParser {
 		public void setRank(String rank) { this.rank = rank; }
 	}
 	
+	public static class Date{
+		private String beginDate;
+		private String endDate;
+		
+		public String getBeginDate() { return beginDate; }
+		public void setBeginDate(String beginDate) { this.beginDate = beginDate; }
+		public String getEndDate() { return endDate; }
+		public void setEndDate(String endDate) { this.endDate = endDate; }
+	}
+	
 	private List<ScientificNames> scientificNames;
 	private List<String> vernacularName;
 	private List<String> locality;
@@ -63,6 +73,7 @@ public class SearchParser {
 	private List<BoundingBox> boundingBox;
 	private List<Integer> dataPublisher;
 	private List<Integer> dataset;
+	private Date date;
 	
 	
 	public List<ScientificNames> getScientificNames() { return scientificNames; }
@@ -83,5 +94,7 @@ public class SearchParser {
 	public void setDataPublisher(List<Integer> dataPublisher) { this.dataPublisher = dataPublisher; }
 	public List<Integer> getDataset() { return dataset; }
 	public void setDataset(List<Integer> dataset) { this.dataset = dataset; }
+	public Date getDate() { return date; }
+	public void setDate(Date date) { this.date = date; }
 	
 }

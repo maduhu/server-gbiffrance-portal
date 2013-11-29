@@ -8,8 +8,10 @@ import models.Occurrence;
 
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.MatchQueryBuilder.Type;
+import org.elasticsearch.index.query.RangeFilterBuilder;
 import org.elasticsearch.search.SearchHit;
 
 import play.libs.Json;
@@ -130,7 +132,7 @@ public class Occurrences extends Controller {
 		return ok(Json.toJson(occurrenceList));
 	}
 	
-	public static BoolQueryBuilder buildRequest(SearchParser search){
+	public static BoolQueryBuilder buildRequestQuery(SearchParser search){
 		
 		BoolQueryBuilder taxaQuery = new BoolQueryBuilder();
 		
@@ -186,13 +188,17 @@ public class Occurrences extends Controller {
 				}
 			}
 		}
-		
-		
-		System.out.print(taxaQuery);
 		return taxaQuery;
 		
 	}
 	
+	public static RangeFilterBuilder buildRequestFilter(SearchParser search){
+
+		System.out.println(search.getDate());
+		RangeFilterBuilder dateFilter  = FilterBuilders.rangeFilter("year_interpreted").from(search.getDate().getBeginDate()).to(search.getDate().getEndDate());
+		return dateFilter;
+		
+	}
 	
 	/**
 	 * Fonction qui lance la requete sur ElasticSearch
@@ -201,17 +207,28 @@ public class Occurrences extends Controller {
 	 */
 	public JsonNode SearchRequest(SearchParser search) {
 		
-		BoolQueryBuilder searchRequest = buildRequest(search);
+		BoolQueryBuilder searchQuery = buildRequestQuery(search);
+		SearchResponse response = new SearchResponse();
 		
-		SearchResponse response = IndexClient.client
-				.prepareSearch("gbiffrance-harvest").setTypes("Occurrence")
-				.setQuery(searchRequest)
-				.execute().actionGet();
-		ArrayList<Occurrence> occurrenceList = new ArrayList<Occurrence>();
-		Long nbrResultat = response.getHits().getTotalHits();
+		if (search.getDate() != null){
+			RangeFilterBuilder searchFilter = buildRequestFilter(search);
+			response = IndexClient.client
+					.prepareSearch("gbiffrance-harvest").setTypes("Occurrence")
+					.setQuery(searchQuery)
+					.setFilter(searchFilter)
+					.execute().actionGet();
+		}else{
+			 response = IndexClient.client
+					.prepareSearch("gbiffrance-harvest").setTypes("Occurrence")
+					.setQuery(searchQuery)
+					.execute().actionGet();
+		}
+		
 		System.out.println(response);
+		ArrayList<Occurrence> occurrenceList = new ArrayList<Occurrence>();
 		for (SearchHit hit : response.getHits())
 			occurrenceList.add(createJson(hit));
+		
 		return Json.toJson(occurrenceList);
 	}
 	
