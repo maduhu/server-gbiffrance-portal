@@ -115,14 +115,41 @@ public class Occurrences extends Controller {
 				.get("sex"));
 		occurrence.setDataset(new Dataset(Long.parseLong((String) hit.getSource()
 				.get("datasetId"))));
+		occurrence.setYear_interpreted((Integer) hit.getSource()
+				.get("year_interpreted"));
 		return occurrence;
 	}
-	
+	private static Occurrence createJsonListOccurrence(SearchHit hit){
+		Occurrence occurrence = new Occurrence();
+		occurrence.setId(Long.parseLong((String) hit.getSource()
+				.get("_id")));
+		occurrence.setDatasetName((String) hit.getSource()
+				.get("datasetName"));
+		occurrence.setBasisOfRecord((String) hit.getSource()
+				.get("basisOfRecord"));
+		occurrence.setCatalogNumber((String) hit.getSource()
+				.get("catalogNumber"));
+		occurrence.setCountry((String) hit.getSource()
+				.get("country"));
+		occurrence.setDecimalLatitude((String) hit.getSource()
+				.get("decimalLatitude"));
+		occurrence.setDecimalLongitude((String) hit.getSource()
+				.get("decimalLongitude"));
+		occurrence.setCoordinatePrecision((String) hit.getSource()
+				.get("coordinatePrecision"));
+		occurrence.setScientificName((String) hit.getSource()
+				.get("scientificName"));
+		occurrence.setEcatConceptId((String) hit.getSource()
+				.get("ecatConceptId"));
+		occurrence.setYear_interpreted((Integer) hit.getSource()
+				.get("year_interpreted"));
+		return occurrence;
+	}
 	/**
 	 * Function that return all the occurrence documents stored in our ElasticSearch 
 	 * @return result JSON
 	 */
-	public static Result searchAll() {
+	public static Result searchAllOccurrences() {
 		SearchResponse response = IndexClient.client
 				.prepareSearch("gbiffrance-harvest").setTypes("Occurrence")
 				.execute().actionGet();
@@ -205,7 +232,7 @@ public class Occurrences extends Controller {
 	 * @param search
 	 * @return
 	 */
-	public JsonNode SearchRequest(SearchParser search) {
+	public JsonNode SearchOccurrences(SearchParser search) {
 		
 		BoolQueryBuilder searchQuery = buildRequestQuery(search);
 		SearchResponse response = new SearchResponse();
@@ -227,9 +254,30 @@ public class Occurrences extends Controller {
 		System.out.println(response);
 		ArrayList<Occurrence> occurrenceList = new ArrayList<Occurrence>();
 		for (SearchHit hit : response.getHits())
-			occurrenceList.add(createJson(hit));
+			occurrenceList.add(createJsonListOccurrence(hit));
 		
 		return Json.toJson(occurrenceList);
+	}
+	
+	/**
+	 * Fonction qui lance la requete sur ElasticSearch
+	 * @param search
+	 * @return
+	 */
+	public JsonNode SearchOccurrence(String occurrenceId) {
+		String messageErreur;
+		SearchResponse response = IndexClient.client
+				.prepareSearch("gbiffrance-harvest", "Occurrence", occurrenceId)
+				.execute().actionGet();
+		
+		if(response.getHits().getTotalHits() == 0)
+			messageErreur= "Il n'y a pas de résultat";
+		else if(response.getHits().getTotalHits()>1)
+			messageErreur = "Il y a trop de résultat";
+		else
+			return Json.toJson(response.getHits().getAt(1));
+		
+		return Json.toJson("{ erreur :"+messageErreur+"}");
 	}
 	
 

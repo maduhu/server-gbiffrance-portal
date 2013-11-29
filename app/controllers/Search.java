@@ -19,7 +19,7 @@ public class Search extends Controller {
 		ObjectMapper mapper = new ObjectMapper();	 
 		try { 
 			SearchParser search = mapper.readValue(json.traverse(), SearchParser.class);
-			JsonNode jsonResult = occurrenceCtrl.SearchRequest(search);	
+			JsonNode jsonResult = occurrenceCtrl.SearchOccurrences(search);	
 			return ok(jsonResult);
 		} catch (JsonGenerationException e) {
 			e.printStackTrace();
@@ -30,6 +30,14 @@ public class Search extends Controller {
 		}
 		return ok("bla");
 	}
+	
+	@With(CorsWrapper.class)
+	public static Result searchOccurrence(String occurrenceId) {
+		Occurrences occurrenceCtrl = new Occurrences();
+		JsonNode jsonResult = occurrenceCtrl.SearchOccurrence(occurrenceId);	
+		return ok(jsonResult);
+	}
+
 
 }
 

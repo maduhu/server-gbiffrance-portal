@@ -29,190 +29,189 @@ public class Occurrence {
 	private String collectionCode;
 
 	private String datasetName;
-	  private String ownerInstitutionCode;
+	private String ownerInstitutionCode;
 
-	  private String basisOfRecord;
-	  private String informationWithheld;
-	  private String dataGeneralizations;
-	  private String dynamicProperties;
+	private String basisOfRecord;
+	private String informationWithheld;
+	private String dataGeneralizations;
+	private String dynamicProperties;
 
-	  //Occurrence
-	  private String occurrenceID;
-	  private String catalogNumber;
-	  private String occurrenceRemarks;
-	  private String recordNumber;
-	  private String recordedBy;
-	  private String individualID;
-	  private String individualCount;
-	  private String sex;
-	  private String lifeStage;
-	  private String reproductiveCondition;
-	  private String behavior;
-	  private String establishmentMeans;
-	  private String occurrenceStatus;
-	  private String preparations;
-	  private String disposition;
-	  private String otherCatalogNumbers;
-	  private String previousIdentifications;
-	  private String associatedMedia;
-	  private String associatedReferences;
-	  private String associatedOccurrences;
-	  private String associatedSequences;
-	  private String associatedTaxa;
+	// Occurrence
+	private String occurrenceID;
+	private String catalogNumber;
+	private String occurrenceRemarks;
+	private String recordNumber;
+	private String recordedBy;
+	private String individualID;
+	private String individualCount;
+	private String sex;
+	private String lifeStage;
+	private String reproductiveCondition;
+	private String behavior;
+	private String establishmentMeans;
+	private String occurrenceStatus;
+	private String preparations;
+	private String disposition;
+	private String otherCatalogNumbers;
+	private String previousIdentifications;
+	private String associatedMedia;
+	private String associatedReferences;
+	private String associatedOccurrences;
+	private String associatedSequences;
+	private String associatedTaxa;
 
-	  //Event
-	  private String eventID;
-	  private String samplingProtocol;
-	  private String samplingEffort;
-	  private String eventDate;
-	  private String eventTime;
-	  private String startDayOfYear;
-	  private String endDayofYear;
+	// Event
+	private String eventID;
+	private String samplingProtocol;
+	private String samplingEffort;
+	private String eventDate;
+	private String eventTime;
+	private String startDayOfYear;
+	private String endDayofYear;
+	private Integer year_interpreted;
+	
+	private String year;
+	private String month;
+	private String day;
+	private String verbatimEventDate;
+	private String habitat;
+	private String fieldNumber;
+	private String fieldNotes;
+	private String eventRemarks;
 
-	  private String year;
-	  private String month;
-	  private String day;
-	  private String verbatimEventDate;
-	  private String habitat;
-	  private String fieldNumber;
-	  private String fieldNotes;
-	  private String eventRemarks;
+	// Location
+	private String locationID;
+	private String higherGeographyID;
+	private String higherGeography;
 
-	  //Location
-	  private String locationID;
-	  private String higherGeographyID;
-	  private String higherGeography;
+	private String continent;
+	private String waterBody;
+	private String islandGroup;
+	private String island;
 
-	  private String continent;
-	  private String waterBody;
-	  private String islandGroup;
-	  private String island;
+	private String country;
+	private String countryCode;
+	private String stateProvince;
+	private String county;
+	private String municipality;
 
-	  private String country;
-	  private String countryCode;
-	  private String stateProvince;
-	  private String county;
-	  private String municipality;
+	private String locality;
+	private String verbatimLocality;
+	private String verbatimElevation;
+	private String minimumElevationInMeters;
+	private String maximumElevationInMeters;
+	private String verbatimDepth;
+	private String minimumDepthInMeters;
+	private String maximumDepthInMeters;
+	private String minimumDistanceAboveSurfaceInMeters;
+	private String maximumDistanceAboveSurfaceInMeters;
+	private String locationAccordingTo;
+	private String locationRemarks;
+	private String verbatimCoordinates;
+	private String verbatimLatitude;
+	private String verbatimLongitude;
+	private String verbatimCoordinateSystem;
+	private String verbatimSRS;
 
-	  private String locality;
-	  private String verbatimLocality;
-	  private String verbatimElevation;
-	  private String minimumElevationInMeters;
-	  private String maximumElevationInMeters;
-	  private String verbatimDepth;
-	  private String minimumDepthInMeters;
-	  private String maximumDepthInMeters;
-	  private String minimumDistanceAboveSurfaceInMeters;
-	  private String maximumDistanceAboveSurfaceInMeters;
-	  private String locationAccordingTo;
-	  private String locationRemarks;
-	  private String verbatimCoordinates;
-	  private String verbatimLatitude;
-	  private String verbatimLongitude;
-	  private String verbatimCoordinateSystem;
-	  private String verbatimSRS;
+	private String decimalLatitude;
 
-	  private String decimalLatitude;
+	private String decimalLongitude;
+	private String geodeticDatum;
+	private String coordinateUncertaintyInMeters;
+	private String coordinatePrecision;
+	private String pointRadiusSpatialFit;
+	private String footprintWKT;
+	private String footprintSRS;
+	private String footprintSpatialFit;
+	private String georeferencedBy;
+	private String georeferencedDate;
+	private String georeferenceProtocol;
+	private String georeferenceSources;
+	private String georeferenceVerificationStatus;
+	private String georeferenceRemarks;
 
-	  private String decimalLongitude;
-	  private String geodeticDatum;
-	  private String coordinateUncertaintyInMeters;
-	  private String coordinatePrecision;
-	  private String pointRadiusSpatialFit;
-	  private String footprintWKT;
-	  private String footprintSRS;
-	  private String footprintSpatialFit;
-	  private String georeferencedBy;
-	  private String georeferencedDate;
-	  private String georeferenceProtocol;
-	  private String georeferenceSources;
-	  private String georeferenceVerificationStatus;
-	  private String georeferenceRemarks;
+	// GeologicalContext
+	private String geologicalContextID;
+	private String earliestEonOrLowestEonothem;
+	private String latestEonOrHighestEonothem;
+	private String earliestEraOrLowestErathem;
+	private String latestEraOrHighestErathem;
+	private String earliestPeriodOrLowestSystem;
+	private String latestPeriodOrHighestSystem;
+	private String earliestEpochOrLowestSeries;
+	private String latestEpochOrHighestSeries;
+	private String earliestAgeOrLowestStage;
+	private String latestAgeOrHighestStage;
+	private String lowestBiostratigraphicZone;
+	private String highestBiostratigraphicZone;
+	private String lithostratigraphicTerms;
+	private String groupp;
+	private String formation;
+	private String member;
+	private String bed;
 
-	  //GeologicalContext
-	  private String geologicalContextID;
-	  private String earliestEonOrLowestEonothem;
-	  private String latestEonOrHighestEonothem;
-	  private String earliestEraOrLowestErathem;
-	  private String latestEraOrHighestErathem;
-	  private String earliestPeriodOrLowestSystem;
-	  private String latestPeriodOrHighestSystem;
-	  private String earliestEpochOrLowestSeries;
-	  private String latestEpochOrHighestSeries;
-	  private String earliestAgeOrLowestStage;
-	  private String latestAgeOrHighestStage;
-	  private String lowestBiostratigraphicZone;
-	  private String highestBiostratigraphicZone;
-	  private String lithostratigraphicTerms;
-	  private String groupp;
-	  private String formation;
-	  private String member;
-	  private String bed;
+	// Identification
+	private String identificationID;
+	private String identifiedBy;
+	private String dateIdentified;
+	private String identificationVerificationStatus;
+	private String identificationRemarks;
+	private String identificationQualifier;
+	private String typeStatus;
 
-	  //Identification
-	  private String identificationID;
-	  private String identifiedBy;
-	  private String dateIdentified;
-	  private String identificationVerificationStatus;
-	  private String identificationRemarks;
-	  private String identificationQualifier;
-	  private String typeStatus;
+	// Taxon
+	private String taxonID;
+	private String scientificNameID;
+	private String acceptedNameUsageID;
+	private String parentNameUsageID;
+	private String originalNameUsageID;
+	private String nameAccordingToID;
+	private String namePublishedInID;
+	private String taxonConceptID;
 
-	  //Taxon
-	  private String taxonID;
-	  private String scientificNameID;
-	  private String acceptedNameUsageID;
-	  private String parentNameUsageID;
-	  private String originalNameUsageID;
-	  private String nameAccordingToID;
-	  private String namePublishedInID;
-	  private String taxonConceptID;
+	private String scientificName;
+	private String acceptedNameUsage;
+	private String parentNameUsage;
+	private String originalNameUsage;
+	private String nameAccordingTo;
+	private String namePublishedIn;
+	private String namePublishedInYear;
+	private String higherClassification;
+	private String kingdom;
+	private String phylum;
+	private String classs; // class is a Java keyword
+	private String orderr; // order is a SQL keyword
+	private String family;
+	private String genus;
+	private String subgenus;
+	private String specificEpithet;
+	private String infraSpecificEpithet;
+	private String kingdom_interpreted;
+	private String phylum_interpreted;
+	private String classs_interpreted;
+	private String orderr_interpreted;
+	private String family_interpreted;
+	private String genus_interpreted;
+	private String subgenus_interpreted;
+	private String specificEpithet_interpreted;
+	private String infraSpecificEpithet_interpreted;
+	private String taxonRank;
+	private String verbatimTaxonRank;
+	private String scientificNameAuthorship;
+	private String vernacularName;
+	private String nomenclaturalCode;
+	private String taxonomicStatus;
+	private String nomenclaturalStatus;
+	private String taxonRemarks;
 
-	  private String scientificName;
-	  private String acceptedNameUsage;
-	  private String parentNameUsage;
-	  private String originalNameUsage;
-	  private String nameAccordingTo;
-	  private String namePublishedIn;
-	  private String namePublishedInYear;
-	  private String higherClassification;
-	  private String kingdom;
-	  private String phylum;
-	  private String classs; //class is a Java keyword
-	  private String orderr; //order is a SQL keyword
-	  private String family;
-	  private String genus;
-	  private String subgenus;
-	  private String specificEpithet;
-	  private String infraSpecificEpithet;
-	  private String kingdom_interpreted;
-	  private String phylum_interpreted;
-	  private String classs_interpreted;
-	  private String orderr_interpreted;
-	  private String family_interpreted;
-	  private String genus_interpreted;
-	  private String subgenus_interpreted;
-	  private String specificEpithet_interpreted;
-	  private String infraSpecificEpithet_interpreted;
-	  private String taxonRank;
-	  private String verbatimTaxonRank;
-	  private String scientificNameAuthorship;
-	  private String vernacularName;
-	  private String nomenclaturalCode;
-	  private String taxonomicStatus;
-	  private String nomenclaturalStatus;
-	  private String taxonRemarks;
+	private String taxonStatus;
+	private String ecatConceptId;
+	private String ecatParentId;
 
-
-	  private String taxonStatus;
-	  private String ecatConceptId;
-	  private String ecatParentId;
-
-	  /**
-	   * Hit score get by the occurrence during a search  
-	   */
-	  private float score;
-
+	/**
+	 * Hit score get by the occurrence during a search
+	 */
+	private float score;
 	  
 	  /**
 	   * Related dataset
@@ -1544,81 +1543,25 @@ public class Occurrence {
 		return vernacularName;
 	}
 
-	public void setVernacularName(String vernacularName) {
-		this.vernacularName = vernacularName;
-	}
-
-	public String getNomenclaturalCode() {
-		return nomenclaturalCode;
-	}
-
-	public void setNomenclaturalCode(String nomenclaturalCode) {
-		this.nomenclaturalCode = nomenclaturalCode;
-	}
-
-	public String getTaxonomicStatus() {
-		return taxonomicStatus;
-	}
-
-	public void setTaxonomicStatus(String taxonomicStatus) {
-		this.taxonomicStatus = taxonomicStatus;
-	}
-
-	public String getNomenclaturalStatus() {
-		return nomenclaturalStatus;
-	}
-
-	public void setNomenclaturalStatus(String nomenclaturalStatus) {
-		this.nomenclaturalStatus = nomenclaturalStatus;
-	}
-
-	public String getTaxonRemarks() {
-		return taxonRemarks;
-	}
-
-	public void setTaxonRemarks(String taxonRemarks) {
-		this.taxonRemarks = taxonRemarks;
-	}
-
-	public String getTaxonStatus() {
-		return taxonStatus;
-	}
-
-	public void setTaxonStatus(String taxonStatus) {
-		this.taxonStatus = taxonStatus;
-	}
-
-	public String getEcatConceptId() {
-		return ecatConceptId;
-	}
-
-	public void setEcatConceptId(String ecatConceptId) {
-		this.ecatConceptId = ecatConceptId;
-	}
-
-	public String getEcatParentId() {
-		return ecatParentId;
-	}
-
-	public void setEcatParentId(String ecatParentId) {
-		this.ecatParentId = ecatParentId;
-	}
-
-	public float getScore() {
-		return score;
-	}
-
-	public void setScore(float score) {
-		this.score = score;
-	}
-
-	public Dataset getDataset() {
-		return dataset;
-	}
-
-	public void setDataset(Dataset dataset) {
-		this.dataset = dataset;
-	}
-	  
-	  
+	public void setVernacularName(String vernacularName) { this.vernacularName = vernacularName; }
+	public String getNomenclaturalCode() { return nomenclaturalCode; }
+	public void setNomenclaturalCode(String nomenclaturalCode) { this.nomenclaturalCode = nomenclaturalCode; }
+	public String getTaxonomicStatus() { return taxonomicStatus; }
+	public void setTaxonomicStatus(String taxonomicStatus) { this.taxonomicStatus = taxonomicStatus; }
+	public String getNomenclaturalStatus() { return nomenclaturalStatus; }
+	public void setNomenclaturalStatus(String nomenclaturalStatus) { this.nomenclaturalStatus = nomenclaturalStatus; }
+	public String getTaxonRemarks() { return taxonRemarks; }
+	public void setTaxonRemarks(String taxonRemarks) { this.taxonRemarks = taxonRemarks; }
+	public String getTaxonStatus() { return taxonStatus; }
+	public void setTaxonStatus(String taxonStatus) { this.taxonStatus = taxonStatus; }
+	public String getEcatConceptId() { return ecatConceptId; }
+	public void setEcatConceptId(String ecatConceptId) { this.ecatConceptId = ecatConceptId; }
+	public String getEcatParentId() { return ecatParentId; }
+	public void setEcatParentId(String ecatParentId) { this.ecatParentId = ecatParentId; }
+	public float getScore() { return score; }
+	public void setScore(float score) { this.score = score; }
+	public Dataset getDataset() { return dataset; }
+	public void setDataset(Dataset dataset) { this.dataset = dataset; }
+	public Integer getYear_interpreted() { return year_interpreted; }
+	public void setYear_interpreted(Integer year_interpreted) { this.year_interpreted = year_interpreted; }  
 }

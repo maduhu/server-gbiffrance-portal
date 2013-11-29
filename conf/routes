@@ -2,12 +2,15 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-OPTIONS  /api/search                controllers.Cors.cors()
-#GET     /api/search                controllers.Search.index()
-POST     /api/search                controllers.Search.searchOccurrences()
-GET 	 /api/datapublisher			controllers.DataPublishers.searchAll()
-GET 	 /api/dataset				controllers.Datasets.searchAll()
-GET		 /api/occurrence			controllers.Occurrences.searchAll()
+OPTIONS  	/api/search                					controllers.Cors.cors()
+OPTIONS  	/api/search/occurrences    					controllers.Cors.cors()
+OPTIONS  	/api/search/occurrence    					controllers.Cors.cors()
+
+POST		/api/search/occurrences   					controllers.Search.searchOccurrences()
+GET			/api/search/occurrence/:occurrenceId		controllers.Search.searchOccurrence(occurrenceId:String)
+GET 	 	/api/datapublisher							controllers.DataPublishers.searchAll()
+GET 	 	/api/dataset								controllers.Datasets.searchAll()
+#GET		 	/api/occurrence								controllers.Occurrences.searchAll()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
