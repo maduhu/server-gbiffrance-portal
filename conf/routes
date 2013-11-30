@@ -4,13 +4,16 @@
 
 OPTIONS  	/api/search                					controllers.Cors.cors()
 OPTIONS  	/api/search/occurrences    					controllers.Cors.cors()
-OPTIONS  	/api/search/occurrence    					controllers.Cors.cors()
+OPTIONS  	/api/occurrence    							controllers.Cors.cors()
+OPTIONS  	/api/datapublisher                			controllers.Cors.cors()
+OPTIONS 	/api/dataset								controllers.Cors.cors()
+OPTIONS 	/api/occurrence/:occurrenceId				controllers.Cors.cors1(occurrenceId:String)
 
 POST		/api/search/occurrences   					controllers.Search.searchOccurrences()
-GET			/api/search/occurrence/:occurrenceId		controllers.Search.searchOccurrence(occurrenceId:String)
+GET			/api/occurrence/:occurrenceId				controllers.Occurrences.get(occurrenceId:String)
 GET 	 	/api/datapublisher							controllers.DataPublishers.searchAll()
 GET 	 	/api/dataset								controllers.Datasets.searchAll()
-#GET		 	/api/occurrence								controllers.Occurrences.searchAll()
+#GET		/api/occurrence								controllers.Occurrences.searchAll()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

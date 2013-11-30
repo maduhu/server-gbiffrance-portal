@@ -10,4 +10,11 @@ public class Cors extends Controller{
         response().setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
         return ok();
     } 
+    
+    public static Result cors1(String params) {
+        response().setHeader("Access-Control-Allow-Origin", "*");
+        response().setHeader("Access-Control-Allow-Headers", "Content-Type");
+        response().setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+        return ok();
+    } 
 }

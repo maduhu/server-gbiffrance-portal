@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import models.Dataset;
 import models.Occurrence;
 
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
@@ -17,6 +18,7 @@ import org.elasticsearch.search.SearchHit;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.With;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.cleverage.elasticsearch.IndexClient;
@@ -264,20 +266,13 @@ public class Occurrences extends Controller {
 	 * @param search
 	 * @return
 	 */
-	public JsonNode SearchOccurrence(String occurrenceId) {
-		String messageErreur;
-		SearchResponse response = IndexClient.client
-				.prepareSearch("gbiffrance-harvest", "Occurrence", occurrenceId)
+	@With(CorsWrapper.class)
+	public static Result get(String occurrenceId) {
+		System.out.println(occurrenceId);
+		GetResponse response = IndexClient.client
+				.prepareGet("gbiffrance-harvest", "Occurrence", occurrenceId)
 				.execute().actionGet();
-		
-		if(response.getHits().getTotalHits() == 0)
-			messageErreur= "Il n'y a pas de résultat";
-		else if(response.getHits().getTotalHits()>1)
-			messageErreur = "Il y a trop de résultat";
-		else
-			return Json.toJson(response.getHits().getAt(1));
-		
-		return Json.toJson("{ erreur :"+messageErreur+"}");
+		return ok(Json.toJson(response.getSource()));
 	}
 	
 

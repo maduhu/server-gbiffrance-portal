@@ -31,13 +31,6 @@ public class Search extends Controller {
 		return ok("bla");
 	}
 	
-	@With(CorsWrapper.class)
-	public static Result searchOccurrence(String occurrenceId) {
-		Occurrences occurrenceCtrl = new Occurrences();
-		JsonNode jsonResult = occurrenceCtrl.SearchOccurrence(occurrenceId);	
-		return ok(jsonResult);
-	}
-
 
 }
 
