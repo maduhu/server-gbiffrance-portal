@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import models.DataPublisher;
 
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.SearchHit;
 
@@ -46,11 +47,28 @@ public class DataPublishers extends Controller {
 					.get("technicalContact"));
 			dataPublisher.setTags((ArrayList<String>) hit.getSource()
 					.get("tags"));
+			dataPublisher.setType((String) hit.getSource()
+					.get("type"));
+			dataPublisher.setTown((String) hit.getSource()
+					.get("town"));
 			dataPublisherList.add(dataPublisher);
 		}
 		
 		return ok(Json.toJson(dataPublisherList));
-//		return ok(Response.toString());
+	}
+	
+	/**
+	 * Fonction qui lance la requete sur ElasticSearch
+	 * @param search
+	 * @return
+	 */
+	@With(CorsWrapper.class)
+	public static Result get(String datapublisherId) {
+		System.out.println(datapublisherId);
+		GetResponse response = IndexClient.client
+				.prepareGet("gbiffrance-harvest", "DataPublisher", datapublisherId)
+				.execute().actionGet();
+		return ok(Json.toJson(response.getSource()));
 	}
 
 }
