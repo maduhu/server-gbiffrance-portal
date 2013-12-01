@@ -64,6 +64,7 @@ public class SearchParser {
 		public void setEndDate(String endDate) { this.endDate = endDate; }
 	}
 	
+	
 	private List<ScientificNames> scientificNames;
 	private List<String> vernacularName;
 	private List<String> locality;
@@ -71,8 +72,7 @@ public class SearchParser {
 	private List<GeoBound> longitude;
 	private boolean geolocalizedData;
 	private List<BoundingBox> boundingBox;
-	private List<Integer> dataPublisher;
-	private List<Integer> dataset;
+	private List<Long> datasetId;
 	private Date date;
 	
 	
@@ -90,10 +90,8 @@ public class SearchParser {
 	public void setGeolocalizedData(boolean geolocalizedData) { this.geolocalizedData = geolocalizedData; }
 	public List<BoundingBox> getBoundingBox() { return boundingBox; }
 	public void setBoundingBox(List<BoundingBox> boundingBox) { this.boundingBox = boundingBox; }
-	public List<Integer> getDataPublisher() { return dataPublisher; }
-	public void setDataPublisher(List<Integer> dataPublisher) { this.dataPublisher = dataPublisher; }
-	public List<Integer> getDataset() { return dataset; }
-	public void setDataset(List<Integer> dataset) { this.dataset = dataset; }
+	public List<Long> getDataset() { return datasetId; }
+	public void setDataset(List<Long> datasetId) { this.datasetId = datasetId; }
 	public Date getDate() { return date; }
 	public void setDate(Date date) { this.date = date; }
 	
