@@ -6,6 +6,7 @@ import java.util.List;
 import models.DataPublisher;
 import models.Dataset;
 
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -70,25 +71,18 @@ public class Datasets extends Controller{
 		return ok(Json.toJson(datasetList));
 	}
 	
-	public JsonNode getDatasetByDatapublisherID(String datapublisherId){
-		
-		QueryBuilder datasetQuery = QueryBuilders
-                .boolQuery()
-                .must(QueryBuilders.termQuery("datapublisherId", datapublisherId));
-
-                
-		SearchResponse response = IndexClient.client
-				.prepareSearch("gbiffrance-harvest")
-				.setTypes("Dataset")
-				.setQuery(datasetQuery)
-				.execute()
-				.actionGet();
-		
-		List<Dataset> datasetList = new ArrayList<Dataset>();
-
-		for (SearchHit hit : response.getHits()) 
-			datasetList.add(createJson(hit));
-		
-		return Json.toJson(datasetList);
+	/**
+	 * Fonction qui lance la requete sur ElasticSearch
+	 * @param search
+	 * @return
+	 */
+	@With(CorsWrapper.class)
+	public static Result get(String datasetId) {
+		System.out.println(datasetId);
+		GetResponse response = IndexClient.client
+				.prepareGet("gbiffrance-harvest", "Dataset", datasetId)
+				.execute().actionGet();
+		return ok(Json.toJson(response.getSource()));
 	}
+
 }

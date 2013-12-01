@@ -31,12 +31,5 @@ public class Search extends Controller {
 		return ok("bla");
 	}
 	
-	@With(CorsWrapper.class)
-	public static Result searchDatasetByDatapublisher(String datapublisherId){
-		Datasets datasetCtrl = new Datasets();
-		JsonNode jsonResult = datasetCtrl.getDatasetByDatapublisherID(datapublisherId);
-		return ok(jsonResult);
-	}
-
 }
 
