@@ -164,6 +164,8 @@ public class Occurrences extends Controller {
 	public static BoolQueryBuilder buildRequestQuery(SearchParser search){
 		
 		BoolQueryBuilder taxaQuery = new BoolQueryBuilder();
+		BoolQueryBuilder datasetQuery = new BoolQueryBuilder();
+		BoolQueryBuilder finalQuery = new BoolQueryBuilder();
 		
 		if(!search.getScientificNames().isEmpty()){
 			for(int i=0; i< search.getScientificNames().size(); ++i){
@@ -217,7 +219,23 @@ public class Occurrences extends Controller {
 				}
 			}
 		}
-		return taxaQuery;
+		
+		if(!search.getDataset().isEmpty()){
+			for(int i=0; i< search.getDataset().size(); ++i){
+				datasetQuery = QueryBuilders.boolQuery()
+//									.should(QueryBuilders.matchQuery("dataset.$id", search.getDataset().get(i)));
+									.should(QueryBuilders.matchQuery("datasetId", search.getDataset().get(i)));
+			}
+		}
+		
+		finalQuery = QueryBuilders.boolQuery()
+						.must(taxaQuery)
+						.must(datasetQuery);
+		
+		System.out.println(finalQuery);
+		return finalQuery;
+		
+//		return taxaQuery;
 		
 	}
 	
