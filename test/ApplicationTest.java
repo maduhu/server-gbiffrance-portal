@@ -18,6 +18,9 @@ import play.libs.F.*;
 import static play.test.Helpers.*;
 import static org.fest.assertions.Assertions.*;
 
+import controllers.Search.GeoBound;
+
+import org.elasticsearch.common.geo.GeoPoint;
 
 /**
 *
@@ -31,6 +34,24 @@ public class ApplicationTest {
     public void simpleCheck() {
         int a = 1 + 1;
         assertThat(a).isEqualTo(2);
+    }
+
+    @Test
+    public void subGeoBoundCheck() {
+        GeoBound global = new GeoBound(4.0, 0.0, 0.0, 4.0);
+
+        assertThat(global.subBound(0, 0, 4, 4)).isEqualTo(new GeoBound(1.0, 0.0, 0.0, 1.0));
+        assertThat(global.subBound(0, 3, 4, 4)).isEqualTo(new GeoBound(1.0, 3.0, 0.0, 4.0));
+        assertThat(global.subBound(1, 1, 4, 4)).isEqualTo(new GeoBound(2.0, 1.0, 1.0, 2.0));
+        assertThat(global.subBound(3, 0, 4, 4)).isEqualTo(new GeoBound(4.0, 0.0, 3.0, 1.0));
+        assertThat(global.subBound(3, 3, 4, 4)).isEqualTo(new GeoBound(4.0, 3.0, 3.0, 4.0));
+    }
+
+    @Test
+    public void geoCenterCheck() {
+        GeoBound global = new GeoBound(4.0, 0.0, 0.0, 4.0);
+
+        assertThat(global.center()).isEqualTo(new GeoPoint(2.0, 2.0));
     }
 
     @Test
