@@ -234,7 +234,7 @@ public class Occurrences extends Controller {
 	 * @param search
 	 * @return
 	 */
-	public JsonNode SearchOccurrences(SearchParser search) {
+	public static JsonNode searchOccurrences(SearchParser search) {
 		
 		BoolQueryBuilder searchQuery = buildRequestQuery(search);
 		SearchResponse response = new SearchResponse();
