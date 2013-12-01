@@ -3,7 +3,6 @@ package controllers;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.LinkedHashMap;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -22,7 +21,6 @@ import org.elasticsearch.search.facet.query.QueryFacet;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchType;
 
-import org.elasticsearch.action.search.SearchResponse;
 
 import com.github.cleverage.elasticsearch.IndexClient;
 
@@ -112,13 +110,7 @@ public class Search extends Controller {
 		}
 		return ok("bla");
 	}
-	
-	@With(CorsWrapper.class)
-	public static Result searchDatasetByDatapublisher(String datapublisherId){
-		Datasets datasetCtrl = new Datasets();
-		JsonNode jsonResult = datasetCtrl.getDatasetByDatapublisherID(datapublisherId);
-		return ok(jsonResult);
-	}
+
 
 	@With(CorsWrapper.class)
 	public static Result searchOccurrencesTile(double nwLat, double nwLng, double seLat, double seLng) {
