@@ -25,23 +25,30 @@ public class SearchParser {
 	}
 	
 	public static class BoundingBox{
-		public static class Point {
-			private Float latitude;
-			private Float longitude;
+		public static class Bound{
+			public static class Point{
+				private String lat;
+				private String lng;
+				public String getLat() { return lat; }
+				public void setLat(String lat) { this.lat = lat; }
+				public String getLng() { return lng; }
+				public void setLng(String lng) { this.lng = lng; }
+			}
 			
-			public Float getLatitude() { return latitude; }
-			public void setLatitude(Float latitude) { this.latitude = latitude; }
-			public Float getLongitude() { return longitude; }
-			public void setLongitude(Float longitude) { this.longitude = longitude;}
+			private Point _northEast;
+			private Point _southWest;
+			public Point get_northEast() { return _northEast; }
+			public void set_northEast(Point _northEast) { this._northEast = _northEast; }
+			public Point get_southWest() { return _southWest; }
+			public void set_southWest(Point _southWest) { this._southWest = _southWest; }
 		}
 		
-		private Point northEast;
-		private Point southWest;
-		
-		public Point getNorthEast() { return northEast; }
-		public void setNorthEast(Point northEast) { this.northEast = northEast; }
-		public Point getSouthWest() { return southWest; }
-		public void setSouthWest(Point southWest) { this.southWest = southWest; }
+		private Bound bounds;
+		private String name;
+		public Bound getBounds() { return bounds; }
+		public void setBounds(Bound bounds) { this.bounds = bounds; }
+		public String getName() { return name; }
+		public void setName(String name) { this.name = name; }
 	}
 	
 	public static class ScientificNames {
@@ -52,6 +59,16 @@ public class SearchParser {
 		public void setScientificName(String scientificName) { this.scientificName = scientificName; }
 		public String getRank() { return rank; }
 		public void setRank(String rank) { this.rank = rank; }
+	}
+	
+	public static class Locality{
+		private String name;
+		private String[] bounds;
+		
+		public String getName() { return name; }
+		public void setName(String name) { this.name = name; }
+		public String[] getBounds() { return bounds; }
+		public void setBounds(String[] bounds) { this.bounds = bounds; }
 	}
 	
 	public static class Date{
@@ -67,7 +84,7 @@ public class SearchParser {
 	
 	private List<ScientificNames> scientificNames;
 	private List<String> vernacularName;
-	private List<String> locality;
+	private List<Locality> localities;
 	private List<GeoBound> latitude;
 	private List<GeoBound> longitude;
 	private boolean geolocalizedData;
@@ -80,8 +97,8 @@ public class SearchParser {
 	public void setScientificNames(List<ScientificNames> scientificNames) { this.scientificNames = scientificNames; }
 	public List<String> getVernacularName() { return vernacularName; }
 	public void setVernacularName(List<String> vernacularName) { this.vernacularName = vernacularName; }
-	public List<String> getLocality() { return locality; }
-	public void setLocality(List<String> locality) { this.locality = locality; }
+	public List<Locality> getLocalities() { return localities; }
+	public void setLocality(List<Locality> localities) { this.localities = localities; }
 	public List<GeoBound> getLatitude() { return latitude; }
 	public void setLatitude(List<GeoBound> latitude) { this.latitude = latitude; }
 	public List<GeoBound> getLongitude() { return longitude; }
@@ -91,7 +108,7 @@ public class SearchParser {
 	public List<BoundingBox> getBoundingBox() { return boundingBox; }
 	public void setBoundingBox(List<BoundingBox> boundingBox) { this.boundingBox = boundingBox; }
 	public List<Long> getDataset() { return datasetId; }
-	public void setDataset(List<Long> datasetId) { this.datasetId = datasetId; }
+	public void setDataset(List<Long> dataset) { this.datasetId = dataset; }
 	public Date getDate() { return date; }
 	public void setDate(Date date) { this.date = date; }
 	

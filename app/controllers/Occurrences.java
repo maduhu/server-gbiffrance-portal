@@ -169,8 +169,9 @@ public class Occurrences extends Controller {
 		BoolQueryBuilder taxaQuery = QueryBuilders.boolQuery();
 		BoolQueryBuilder datasetQuery = QueryBuilders.boolQuery();
 		BoolQueryBuilder finalQuery = new BoolQueryBuilder();
+		BoolQueryBuilder geoQuery = QueryBuilders.boolQuery();
 		
-		if(!search.getScientificNames().isEmpty()){
+		if(search.getScientificNames()!= null){
 			for(int i=0; i< search.getScientificNames().size(); ++i){
 				Rank rank = Rank.valueOf(search.getScientificNames().get(i).getRank());
 				switch (rank) {
@@ -223,7 +224,7 @@ public class Occurrences extends Controller {
 			}
 		}
 		
-		if(!search.getDataset().isEmpty()){
+		if(search.getDataset() != null){
 			for(int i=0; i< search.getDataset().size(); ++i){
 				datasetQuery = datasetQuery
 //									.should(QueryBuilders.matchQuery("dataset.$id", search.getDataset().get(i)));
@@ -231,9 +232,69 @@ public class Occurrences extends Controller {
 			}
 		}
 		
+		if(search.getLatitude()!=null || search.getLongitude() != null || search.getLocalities() != null || search.getBoundingBox() !=null){
+			
+			if(search.getBoundingBox() != null){
+				BoolQueryBuilder boundingBoxQuery = new BoolQueryBuilder();
+				for(int i=0; i< search.getBoundingBox().size(); ++i){
+					geoQuery = geoQuery.should(boundingBoxQuery
+								.must(QueryBuilders.rangeQuery("decimalLatitude")
+										.gte(search.getBoundingBox().get(i).getBounds().get_southWest().getLat())
+										.lt(search.getBoundingBox().get(i).getBounds().get_northEast().getLat()))
+								.must(QueryBuilders.rangeQuery("decimalLongitude")
+										.gte(search.getBoundingBox().get(i).getBounds().get_southWest().getLng())
+										.lt(search.getBoundingBox().get(i).getBounds().get_northEast().getLng())));
+				}
+			}
+			
+			if(search.getLatitude() != null){
+				BoolQueryBuilder latitudeQuery = new BoolQueryBuilder();
+				for(int i=0; i< search.getLatitude().size(); ++i){
+					if(search.getLatitude().get(i).getFilter().equals("inf")){
+						geoQuery = geoQuery.should(latitudeQuery
+									.should(QueryBuilders.rangeQuery("decimalLatitude")
+											.lte(search.getLatitude().get(i).getBound())));
+					}else{
+						geoQuery = geoQuery.should(latitudeQuery
+								.should(QueryBuilders.rangeQuery("decimalLatitude")
+										.gte(search.getLatitude().get(i).getBound())));
+					}		
+				}
+			}
+			
+			if(search.getLongitude() != null){
+				BoolQueryBuilder longitudeQuery = new BoolQueryBuilder();
+				for(int i=0; i< search.getLongitude().size(); ++i){
+					if(search.getLongitude().get(i).getFilter().equals("inf")){
+						geoQuery = geoQuery.should(longitudeQuery
+									.should(QueryBuilders.rangeQuery("decimalLongitude")
+											.lte(search.getLongitude().get(i).getBound())));
+					}else{
+						geoQuery = geoQuery.should(longitudeQuery
+								.should(QueryBuilders.rangeQuery("decimalLongitude")
+										.gte(search.getLongitude().get(i).getBound())));
+					}		
+				}
+			}
+			
+			if(search.getLocalities()!=null){
+				BoolQueryBuilder localityQuery = new BoolQueryBuilder();
+				for(int i=0; i< search.getLocalities().size(); ++i){
+					geoQuery = geoQuery.should(localityQuery
+								.must(QueryBuilders.rangeQuery("decimalLatitude")
+										.gte(search.getLocalities().get(i).getBounds()[0])
+										.lt(search.getLocalities().get(i).getBounds()[1]))
+								.must(QueryBuilders.rangeQuery("decimalLongitude")
+										.gte(search.getLocalities().get(i).getBounds()[2])
+										.lt(search.getLocalities().get(i).getBounds()[3])));
+				}
+			}
+		}
+		
 		finalQuery = QueryBuilders.boolQuery()
 						.must(taxaQuery)
-						.must(datasetQuery);
+						.must(datasetQuery)
+						.must(geoQuery);
 		
 		return finalQuery;		
 	}
