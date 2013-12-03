@@ -20,7 +20,7 @@ import org.elasticsearch.search.facet.query.QueryFacetBuilder;
 import org.elasticsearch.search.facet.query.QueryFacet;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchType;
-
+import org.elasticsearch.search.SearchHit;
 
 import com.github.cleverage.elasticsearch.IndexClient;
 
@@ -109,6 +109,64 @@ public class Search extends Controller {
 			e.printStackTrace();
 		}
 		return ok(json);
+	}
+
+	public static class Marker{
+		public double lat;
+		public double lng;
+		public long id;
+
+		public Marker(double lat, double lng, long id) {
+			this.lat = lat;
+			this.lng = lng;
+			this.id = id;
+		}
+	}
+
+	@With(CorsWrapper.class)
+	public static Result searchOccurrencesMarkers(double nwLat, double nwLng, double seLat, double seLng) {
+		JsonNode json = request().body().asJson();
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			SearchParser search = mapper.readValue(json.traverse(), SearchParser.class);
+			BoolQueryBuilder baseQuery = Occurrences.buildRequestQuery(search);
+
+			baseQuery
+				.must(QueryBuilders.rangeQuery("decimalLatitude_interpreted")
+					.gte(seLat)
+					.lt(nwLat))
+				.must(QueryBuilders.rangeQuery("decimalLongitude_interpreted")
+					.gte(nwLng)
+					.lt(seLng));
+
+			SearchRequestBuilder query = IndexClient.client
+				.prepareSearch("gbiffrance-harvest").setTypes("Occurrence")
+				.setQuery(baseQuery)
+				.setSize(500);
+
+			SearchResponse elasticResponse = query.execute().actionGet();
+			ArrayList<Marker> response = new ArrayList();
+
+			for (SearchHit hit: elasticResponse.getHits().hits()) {
+				Map<String, Object> h = hit.sourceAsMap();
+				response.add(
+					new Marker(
+						(double) h.get("decimalLatitude_interpreted"),
+						(double) h.get("decimalLongitude_interpreted"),
+						Long.parseLong((String) h.get("_id"), 10)));
+			}
+
+			return ok(Json.toJson(response));
+
+		} catch (JsonGenerationException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return ok("lkjalsd");
+
 	}
 
 
