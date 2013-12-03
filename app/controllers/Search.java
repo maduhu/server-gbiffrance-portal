@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -145,14 +144,14 @@ public class Search extends Controller {
 				.setSize(500);
 
 			SearchResponse elasticResponse = query.execute().actionGet();
-			ArrayList<Marker> response = new ArrayList();
+			ArrayList<Marker> response = new ArrayList<Marker>();
 
 			for (SearchHit hit: elasticResponse.getHits().hits()) {
 				Map<String, Object> h = hit.sourceAsMap();
 				response.add(
 					new Marker(
-						(double) h.get("decimalLatitude_interpreted"),
-						(double) h.get("decimalLongitude_interpreted"),
+						(Double) h.get("decimalLatitude_interpreted"),
+						(Double) h.get("decimalLongitude_interpreted"),
 						Long.parseLong((String) h.get("_id"), 10)));
 			}
 
@@ -179,8 +178,8 @@ public class Search extends Controller {
 			SearchParser search = mapper.readValue(json.traverse(), SearchParser.class);
 			BoolQueryBuilder baseQuery = Occurrences.buildRequestQuery(search);
 
-			ArrayList<GeoBound> subTiles = new ArrayList();
-			ArrayList<QueryFacetBuilder> subQueries = new ArrayList();
+			ArrayList<GeoBound> subTiles = new ArrayList<GeoBound>();
+			ArrayList<QueryFacetBuilder> subQueries = new ArrayList<QueryFacetBuilder>();
 
 			GeoBound global = new GeoBound(nwLat, nwLng, seLat, seLng);
 
@@ -217,7 +216,7 @@ public class Search extends Controller {
 
 			Map<String, Facet> facets = elasticResponse.getFacets().facetsAsMap();
 
-			ArrayList<Zone> response = new ArrayList();
+			ArrayList<Zone> response = new ArrayList<Zone>();
 
 			for (int i = 0; i < divider; i++) {
 				for (int j = 0; j < divider; j++) {
@@ -243,5 +242,22 @@ public class Search extends Controller {
 		return ok("lkjalsd");
 	}
 
+	@With(CorsWrapper.class)
+	public static Result getSearchStatistic(){
+		JsonNode json = request().body().asJson();
+		ObjectMapper mapper = new ObjectMapper();	 
+		try { 
+			SearchParser search = mapper.readValue(json.traverse(), SearchParser.class);
+			JsonNode jsonResult = Occurrences.statisticOccurrence(search);	
+			return ok(jsonResult);
+		} catch (JsonGenerationException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return ok(json);
+	}
 }
 

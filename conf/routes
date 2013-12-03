@@ -12,10 +12,12 @@ OPTIONS     /api/dataset/:datasetId                                     controll
 OPTIONS     /api/occurrence/:occurrenceId                               controllers.Cors.cors1(occurrenceId:String)
 OPTIONS     /api/search/occurrences/markers/:nwLat/:nwLng/:seLat/:seLng controllers.Cors.cors4(nwLat: String, nwLng: String, seLat: String, seLng: String)
 OPTIONS     /api/search/occurrences/tile/:nwLat/:nwLng/:seLat/:seLng    controllers.Cors.cors4(nwLat: String, nwLng: String, seLat: String, seLng: String)
+OPTIONS 	/api/search/statistics										controllers.Cors.cors()
 
 POST        /api/search/occurrences                                     controllers.Search.searchOccurrences()
 POST        /api/search/occurrences/markers/:nwLat/:nwLng/:seLat/:seLng controllers.Search.searchOccurrencesMarkers(nwLat: Double, nwLng: Double, seLat: Double, seLng: Double)
 POST        /api/search/occurrences/tile/:nwLat/:nwLng/:seLat/:seLng    controllers.Search.searchOccurrencesTile(nwLat: Double, nwLng: Double, seLat: Double, seLng: Double)
+POST 		/api/search/statistics										controllers.Search.getSearchStatistic()
 GET         /api/occurrence/:occurrenceId                               controllers.Occurrences.get(occurrenceId:String)
 GET         /api/datapublisher                                          controllers.DataPublishers.searchAll()
 GET         /api/datapublisher/:datapublisherId                         controllers.DataPublishers.get(datapublisherId:String)

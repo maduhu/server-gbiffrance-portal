@@ -15,8 +15,14 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.MatchQueryBuilder.Type;
-import org.elasticsearch.index.query.RangeFilterBuilder;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.facet.FacetBuilders;
+import org.elasticsearch.search.facet.datehistogram.DateHistogramFacet;
+import org.elasticsearch.search.facet.datehistogram.DateHistogramFacetBuilder;
+import org.elasticsearch.search.facet.histogram.HistogramFacet;
+import org.elasticsearch.search.facet.histogram.HistogramFacetBuilder;
+import org.elasticsearch.search.facet.terms.TermsFacet;
+import org.elasticsearch.search.facet.terms.TermsFacetBuilder;
 
 import play.libs.Json;
 import play.mvc.Controller;
@@ -30,6 +36,23 @@ public class Occurrences extends Controller {
 	
 	private enum Rank {
 		KINGDOM, PHYLUM, CLASS, ORDER, FAMILY, GENUS, SPECIES, SUBSPECIES
+	}
+	
+	public static class StatisticParser{
+		private String term;
+		private int count;
+		private String name;
+		private String typeFilter;
+		
+		
+		public String getTypeFilter() { return typeFilter; }
+		public void setTypeFilter(String typeFilter) { this.typeFilter = typeFilter;}
+		public String getTerm() { return term; }
+		public void setTerm(String term) { this.term = term;}
+		public int getCount() { return count; }
+		public void setCount(int count) { this.count = count; }
+		public String getName() { return name; }
+		public void setName(String name) { this.name = name; }
 	}
 	
 	private static Occurrence createJson(SearchHit hit){
@@ -150,6 +173,17 @@ public class Occurrences extends Controller {
 				.get("year_interpreted"));
 		return occurrence;
 	}
+	
+	public static StatisticParser createJsonStatistic(String term, int count, String typeFilter, String name){
+		
+		StatisticParser statisticParser = new StatisticParser();
+		statisticParser.setTerm(term);
+		statisticParser.setCount(count);
+		statisticParser.setTypeFilter(typeFilter);
+		statisticParser.setName(name);
+		return statisticParser;
+	}
+	
 	/**
 	 * Function that return all the occurrence documents stored in our ElasticSearch 
 	 * @return result JSON
@@ -358,5 +392,81 @@ public class Occurrences extends Controller {
 		return ok(Json.toJson(response.getSource()));
 	}
 	
+	public static TermsFacetBuilder statTaxon (SearchParser search, BoolFilterBuilder searchFilter){
+	
+		TermsFacetBuilder canonicalNameFacet = new TermsFacetBuilder("ecatConceptId").size(20);
+		canonicalNameFacet.field("ecatConceptId");
+		
+		if (searchFilter != null)
+			canonicalNameFacet.facetFilter(searchFilter);
+		return canonicalNameFacet;
+	}
+	
+	public static TermsFacetBuilder statDataset (SearchParser search, BoolFilterBuilder searchFilter){
+		
+		TermsFacetBuilder datasetFacet = new TermsFacetBuilder("datasetId").size(20);
+		datasetFacet.field("datasetId");
+		
+		if (searchFilter != null)
+			datasetFacet.facetFilter(searchFilter);
+		return datasetFacet;
+	}
+	
+	public static HistogramFacetBuilder statDate (SearchParser search, BoolFilterBuilder searchFilter){
+		
+		HistogramFacetBuilder dateFacet = FacetBuilders.histogramFacet("dateFacet")
+										.field("year_interpreted")
+										.interval(1);
+		if (searchFilter != null)
+			dateFacet.facetFilter(searchFilter);
+		return dateFacet;
+	}
+	
+	
+	public static JsonNode statisticOccurrence(SearchParser search){
+		SearchResponse response = new SearchResponse();
+	
+		BoolQueryBuilder searchQuery = buildRequestQuery(search);
+		BoolFilterBuilder searchFilter = buildRequestFilter(search);
+		TermsFacetBuilder taxaFacet = statTaxon(search, searchFilter);
+		TermsFacetBuilder datasetFacet = statDataset(search, searchFilter);
+		HistogramFacetBuilder dateFacet = statDate(search, searchFilter);
+		
+		response = IndexClient.client
+				.prepareSearch("gbiffrance-harvest").setTypes("Occurrence")
+				.setQuery(searchQuery)
+				.setFilter(searchFilter)
+				.addFacet(taxaFacet)
+				.addFacet(datasetFacet)
+				.addFacet(dateFacet)
+				.execute().actionGet();
+		System.out.println(response);
+		ArrayList<StatisticParser> statList = new ArrayList<StatisticParser>();
+		TermsFacet resultFacetTaxa = (TermsFacet) response.getFacets().facetsAsMap().get("ecatConceptId");
+		TermsFacet resultFacetDataset = (TermsFacet) response.getFacets().facetsAsMap().get("datasetId");
+		HistogramFacet resultFacetDate = (HistogramFacet) response.getFacets().facetsAsMap().get("dateFacet");
+
+		for (TermsFacet.Entry entry : resultFacetTaxa){
+			SearchResponse getScientificName = IndexClient.client
+												.prepareSearch("gbiffrance-harvest").setTypes("Occurrence")
+												.setQuery(QueryBuilders.matchQuery("ecatConceptId", entry.getTerm().string()))
+												.setSize(1)
+												.execute().actionGet();								
+			statList.add(createJsonStatistic(entry.getTerm().string(), entry.getCount(), "taxa", getScientificName.getHits().getAt(0).getSource().get("scientificName").toString()));
+		}
+		
+		for (TermsFacet.Entry entry : resultFacetDataset){
+			GetResponse getDataset = IndexClient.client
+					.prepareGet("gbiffrance-harvest", "Dataset", entry.getTerm().string())
+					.execute().actionGet();							
+			statList.add(createJsonStatistic(entry.getTerm().string(), entry.getCount(), "dataset", getDataset.getSource().get("title").toString()));
+		}
+		
+		for(HistogramFacet.Entry entry : resultFacetDate){
+			statList.add(createJsonStatistic(Long.toString(entry.getKey()), (int) entry.getCount(), "year", "null"));
+		}
+		
+		return Json.toJson(statList);
+	}
 
 }
