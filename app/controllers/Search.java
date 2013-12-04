@@ -121,10 +121,12 @@ public class Search extends Controller {
 			e.printStackTrace();
 		} catch (JsonMappingException e) {
 			e.printStackTrace();
+			return badRequest("Json incorrect");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return ok(json);
+
+		return internalServerError("Oops");
 	}
 
 	public static class Marker{
@@ -178,11 +180,11 @@ public class Search extends Controller {
 			e.printStackTrace();
 		} catch (JsonMappingException e) {
 			e.printStackTrace();
+			return badRequest("Json incorrect");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return ok("lkjalsd");
-
+		return internalServerError("Oops");
 	}
 
 
@@ -253,10 +255,11 @@ public class Search extends Controller {
 			e.printStackTrace();
 		} catch (JsonMappingException e) {
 			e.printStackTrace();
+			return badRequest("Json incorrect");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return ok("lkjalsd");
+		return internalServerError("Oops");
 	}
 
 	@With(CorsWrapper.class)
@@ -265,16 +268,18 @@ public class Search extends Controller {
 		ObjectMapper mapper = new ObjectMapper();	 
 		try { 
 			SearchParser search = mapper.readValue(json.traverse(), SearchParser.class);
-			JsonNode jsonResult = Occurrences.statisticOccurrence(search);	
+			JsonNode jsonResult = Occurrences.statisticOccurrence(search);
+
 			return ok(jsonResult);
 		} catch (JsonGenerationException e) {
 			e.printStackTrace();
 		} catch (JsonMappingException e) {
 			e.printStackTrace();
+			return badRequest("Json incorrect");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return ok(json);
+		return internalServerError("Oops");
 	}
 }
 
