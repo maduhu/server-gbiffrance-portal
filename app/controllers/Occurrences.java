@@ -351,7 +351,7 @@ public class Occurrences extends Controller {
 		
 		return finalFilter;
 		
-	} 
+	}
 	
 	/**
 	 * Fonction qui lance la requete sur ElasticSearch
@@ -359,6 +359,10 @@ public class Occurrences extends Controller {
 	 * @return
 	 */
 	public static JsonNode searchOccurrences(SearchParser search) {
+		return searchOccurrences(search, 0, 10);
+	}
+
+	public static JsonNode searchOccurrences(SearchParser search, Integer page, Integer size) {
 		
 		BoolQueryBuilder searchQuery = buildRequestQuery(search);
 		SearchResponse response = new SearchResponse();
@@ -368,6 +372,8 @@ public class Occurrences extends Controller {
 				.prepareSearch("gbiffrance-harvest").setTypes("Occurrence")
 				.setQuery(searchQuery)
 				.setFilter(searchFilter)
+				.setSize(size)
+				.setFrom(size * page)
 				.execute().actionGet();
 		
 		System.out.println(response);

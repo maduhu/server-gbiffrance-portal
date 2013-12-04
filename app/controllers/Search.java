@@ -94,12 +94,29 @@ public class Search extends Controller {
 
 	@With(CorsWrapper.class)
 	public static Result searchOccurrences() {
+		Http.RequestHeader req = request();
 		JsonNode json = request().body().asJson();
-		ObjectMapper mapper = new ObjectMapper();	 
+		ObjectMapper mapper = new ObjectMapper();
 		try { 
 			SearchParser search = mapper.readValue(json.traverse(), SearchParser.class);
-			JsonNode jsonResult = Occurrences.searchOccurrences(search);	
-			return ok(jsonResult);
+			if (req.getQueryString("page") != null && req.getQueryString("size") != null) {
+				Integer page;
+				Integer size;
+
+				try {
+					page = Integer.parseInt(req.getQueryString("page"), 10);
+					size = Integer.parseInt(req.getQueryString("size"), 10);
+				} catch (Exception e) {
+					return badRequest("invalid pager");
+				}
+
+				JsonNode jsonResult = Occurrences.searchOccurrences(search, page, size);
+				return ok(jsonResult);
+
+			} else {
+				JsonNode jsonResult = Occurrences.searchOccurrences(search);
+				return ok(jsonResult);
+			}
 		} catch (JsonGenerationException e) {
 			e.printStackTrace();
 		} catch (JsonMappingException e) {
