@@ -382,6 +382,10 @@ public class Occurrences extends Controller {
 				.execute().actionGet();
 		
 		System.out.println(response);
+		
+		response().setHeader("Access-Control-Expose-Headers", "X-Max-Hits");
+		response().setHeader("X-Max-Hits", response.getHits().totalHits() + "");
+		
 		ArrayList<Occurrence> occurrenceList = new ArrayList<Occurrence>();
 		for (SearchHit hit : response.getHits())
 			occurrenceList.add(createJsonListOccurrence(hit));
