@@ -4,11 +4,11 @@ package controllers;
 import static org.elasticsearch.index.query.FilterBuilders.existsFilter;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import models.Dataset;
 import models.Occurrence;
 
-import org.elasticsearch.action.count.CountResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolFilterBuilder;
@@ -18,8 +18,6 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.MatchQueryBuilder.Type;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.facet.FacetBuilders;
-import org.elasticsearch.search.facet.datehistogram.DateHistogramFacet;
-import org.elasticsearch.search.facet.datehistogram.DateHistogramFacetBuilder;
 import org.elasticsearch.search.facet.histogram.HistogramFacet;
 import org.elasticsearch.search.facet.histogram.HistogramFacetBuilder;
 import org.elasticsearch.search.facet.terms.TermsFacet;
@@ -56,8 +54,113 @@ public class Occurrences extends Controller {
 		public void setName(String name) { this.name = name; }
 	}
 	
+	@SuppressWarnings("rawtypes")
+	private static Occurrence createJsonOccurrence(Map map){
+		Occurrence occurrence = new Occurrence();
+		String str = (String) map.get("dataset");
+		String delims = "\"";
+		String[] tokens = str.split(delims);
+		String datasetId = tokens[7];
+		occurrence.setDataset(new Dataset(Long.parseLong(datasetId)));
+		if(map.get("datasetName")==null){
+			GetResponse response = IndexClient.client
+					.prepareGet(play.Configuration.root().getString("gbif.elasticsearch.index.dataset"), 
+							play.Configuration.root().getString("gbif.elasticsearch.type.dataset"), datasetId)
+							.execute().actionGet();
+			occurrence.setDatasetName((String)response.getSource().get("name"));
+		}else{
+			occurrence.setDatasetName((String)map.get("datasetName"));
+		}
+		
+		if(map.get("basisOfRecord")==null){
+			occurrence.setBasisOfRecord("occurrence");
+		}else{		
+			occurrence.setBasisOfRecord((String)map.get("basisOfRecord"));
+		}
+		
+		occurrence.setCatalogNumber((String)map.get("catalogNumber"));
+		
+		if(map.get("country")==null){
+			occurrence.setCountry("non renseigné");
+		}else{		
+			occurrence.setCountry((String)map.get("country"));
+		}
+		occurrence.setId(Long.parseLong(map.get("_id").toString()));
+		occurrence.setClassName((String)map.get("className"));
+		occurrence.setTypee((String)map.get("type"));
+		occurrence.setInstitutionCode((String)map.get("institutionCode"));
+		occurrence.setCollectionCode((String)map.get("collectionCode"));
+		occurrence.setStartDayOfYear((String)map.get("startDayOfYear"));
+		occurrence.setEndDayofYear((String)map.get("endDayOfYear"));
+		occurrence.setYear((String)map.get("yearInterpreted"));
+		occurrence.setCountryCode((String)map.get("countryCode"));
+		occurrence.setStateProvince((String)map.get("stateProvince"));
+		occurrence.setMunicipality((String)map.get("municipality"));
+		occurrence.setDecimalLatitude((String)map.get("decimalLatitude"));
+		occurrence.setDecimalLongitude((String)map.get("decimalLongitude"));
+		occurrence.setCoordinatePrecision((String)map.get("coordinatePrecision"));
+		occurrence.setIdentifiedBy((String)map.get("identifiedBy"));
+		occurrence.setNameAccordingToID((String)map.get("nameAccordingToID"));
+		occurrence.setScientificName((String)map.get("scientificName"));
+		occurrence.setNameAccordingTo((String)map.get("nameAccordingTo"));
+		occurrence.setGenus((String)map.get("genus"));
+		occurrence.setKingdom_interpreted((String)map.get("kingdom_interpreted"));
+		occurrence.setPhylum_interpreted((String)map.get("phylum_interpreted"));
+		occurrence.setClasss_interpreted((String)map.get("classs_interpreted"));
+		occurrence.setOrderr_interpreted((String)map.get("orderr_interpreted"));
+		occurrence.setFamily_interpreted((String)map.get("family_interpreted"));
+		occurrence.setGenus_interpreted((String)map.get("genus_interpreted"));
+		occurrence.setFamily_interpreted((String)map.get("family_interpreted"));
+		occurrence.setSpecificEpithet_interpreted((String)map.get("specificEpithet_interpreted"));
+		occurrence.setEcatConceptId((String)map.get("ecatConceptId"));
+		occurrence.setEcatParentId((String)map.get("ecatConceptId"));
+		occurrence.setTaxonStatus((String)map.get("taxonStatus"));
+		occurrence.setIndividualCount((String)map.get("individualCount"));
+		occurrence.setPhylum((String)map.get("phylum"));
+		occurrence.setClasss((String)map.get("classs"));
+		occurrence.setFamily((String)map.get("family"));
+		occurrence.setFieldNumber((String)map.get("fieldNumber"));
+		occurrence.setOccurrenceRemarks((String)map.get("occurrenceRemarks"));
+		occurrence.setRecordedBy((String)map.get("recordedBy"));
+		occurrence.setSex((String)map.get("sex"));
+		if(map.get("year_interpreted")!=null)
+			occurrence.setYear_interpreted(Integer.parseInt((String)map.get("year_interpreted")));
+		return occurrence;
+	}
 	private static Occurrence createJson(SearchHit hit){
 		Occurrence occurrence = new Occurrence();
+		
+		if(hit.getSource().get("datasetName")==null){
+			String str = (String) hit.getSource().get("dataset");
+			String delims = "\"";
+			String[] tokens = str.split(delims);
+			String datasetId = tokens[7];
+			GetResponse response = IndexClient.client
+					.prepareGet(play.Configuration.root().getString("gbif.elasticsearch.index.dataset"), 
+							play.Configuration.root().getString("gbif.elasticsearch.type.dataset"), datasetId)
+							.execute().actionGet();
+			occurrence.setDatasetName((String)response.getSource().get("name"));
+		}else{
+			occurrence.setDatasetName((String) hit.getSource()
+					.get("datasetName"));
+		}
+		
+		if(hit.getSource().get("basisOfRecord")==null){
+			occurrence.setBasisOfRecord("occurrence");
+		}else{		
+			occurrence.setBasisOfRecord((String) hit.getSource()
+					.get("basisOfRecord"));
+		}
+		
+		occurrence.setCatalogNumber((String) hit.getSource()
+				.get("catalogNumber"));
+		
+		if(hit.getSource().get("country")==null){
+			occurrence.setCountry("non renseigné");
+		}else{		
+			occurrence.setCountry((String) hit.getSource()
+					.get("country"));
+		}
 		occurrence.setId(Long.parseLong((String) hit.getSource()
 				.get("_id")));
 		occurrence.setClassName((String) hit.getSource()
@@ -68,20 +171,12 @@ public class Occurrences extends Controller {
 				.get("institutionCode"));
 		occurrence.setCollectionCode((String) hit.getSource()
 				.get("collectionCode"));
-		occurrence.setDatasetName((String) hit.getSource()
-				.get("datasetName"));
-		occurrence.setBasisOfRecord((String) hit.getSource()
-				.get("basisOfRecord"));
-		occurrence.setCatalogNumber((String) hit.getSource()
-				.get("catalogNumber"));
 		occurrence.setStartDayOfYear((String) hit.getSource()
 				.get("startDayOfYear"));
 		occurrence.setEndDayofYear((String) hit.getSource()
 				.get("endDayOfYear"));
 		occurrence.setYear((String) hit.getSource()
 				.get("yearInterpreted"));
-		occurrence.setCountry((String) hit.getSource()
-				.get("country"));
 		occurrence.setCountryCode((String) hit.getSource()
 				.get("countryCode"));
 		occurrence.setStateProvince((String) hit.getSource()
@@ -150,18 +245,38 @@ public class Occurrences extends Controller {
 	}
 	private static Occurrence createJsonListOccurrence(SearchHit hit){
 		Occurrence occurrence = new Occurrence();
-		System.out.println(hit.getSource()
-				.get("_id").getClass());
 		occurrence.setId(Long.parseLong(hit.getSource()
 				.get("_id").toString()));
-		occurrence.setDatasetName((String) hit.getSource()
-				.get("datasetName"));
-		occurrence.setBasisOfRecord((String) hit.getSource()
-				.get("basisOfRecord"));
+		
+		if(hit.getSource().get("datasetName")==null){
+			String str = (String) hit.getSource().get("dataset");
+			String delims = "\"";
+			String[] tokens = str.split(delims);
+			String datasetId = tokens[7];
+			GetResponse response = IndexClient.client
+					.prepareGet(play.Configuration.root().getString("gbif.elasticsearch.index.dataset"), 
+							play.Configuration.root().getString("gbif.elasticsearch.type.dataset"), datasetId)
+							.execute().actionGet();
+			occurrence.setDatasetName((String)response.getSource().get("name"));
+		}else{
+			occurrence.setDatasetName((String) hit.getSource()
+					.get("datasetName"));
+		}
+		if(hit.getSource().get("basisOfRecord")==null){
+			occurrence.setBasisOfRecord("occurrence");
+		}else{		
+			occurrence.setBasisOfRecord((String) hit.getSource()
+					.get("basisOfRecord"));
+		}
 		occurrence.setCatalogNumber((String) hit.getSource()
 				.get("catalogNumber"));
-		occurrence.setCountry((String) hit.getSource()
-				.get("country"));
+		if(hit.getSource().get("country")==null){
+			occurrence.setCountry("non renseigné");
+		}else{		
+			occurrence.setCountry((String) hit.getSource()
+					.get("country"));
+		}
+		
 		occurrence.setDecimalLatitude((String) hit.getSource()
 				.get("decimalLatitude"));
 		occurrence.setDecimalLongitude((String) hit.getSource()
@@ -193,7 +308,8 @@ public class Occurrences extends Controller {
 	 */
 	public static Result searchAllOccurrences() {
 		SearchResponse response = IndexClient.client
-				.prepareSearch("").setTypes("Occurrence")
+				.prepareSearch(play.Configuration.root().getString("gbif.elasticsearch.index.occurrence"))
+				.setTypes(play.Configuration.root().getString("gbif.elasticsearch.type.occurrence"))
 				.execute().actionGet();
 		ArrayList<Occurrence> occurrenceList = new ArrayList<Occurrence>();
 		for (SearchHit hit : response.getHits())
@@ -404,7 +520,8 @@ public class Occurrences extends Controller {
 		GetResponse response = IndexClient.client
 				.prepareGet(play.Configuration.root().getString("gbif.elasticsearch.index.occurrence"), play.Configuration.root().getString("gbif.elasticsearch.type.occurrence"), occurrenceId)
 				.execute().actionGet();
-		System.out.println(response.getSource().get("dataset.$id"));
+		if(response.getSource().get("datasetName")==null || response.getSource().get("basisOfRecord")==null)
+			return ok(Json.toJson(createJsonOccurrence(response.getSource())));
 		return ok(Json.toJson(response.getSource()));
 	}
 	
