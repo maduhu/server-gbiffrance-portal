@@ -158,7 +158,8 @@ public class Search extends Controller {
 					.lt(seLng));
 
 			SearchRequestBuilder query = IndexClient.client
-				.prepareSearch("gbiffrance-harvest").setTypes("Occurrence")
+				.prepareSearch(play.Configuration.root().getString("gbif.elasticsearch.index.occurrence"))
+				.setTypes(play.Configuration.root().getString("gbif.elasticsearch.type.occurrence"))
 				.setQuery(baseQuery)
 				.setSize(500);
 
@@ -167,11 +168,12 @@ public class Search extends Controller {
 
 			for (SearchHit hit: elasticResponse.getHits().hits()) {
 				Map<String, Object> h = hit.sourceAsMap();
-				response.add(
-					new Marker(
-						(Double) h.get("decimalLatitude_interpreted"),
-						(Double) h.get("decimalLongitude_interpreted"),
-						Long.parseLong((String) h.get("_id"), 10)));
+
+				Double lat = (Double) h.get("decimalLatitude_interpreted");
+				Double lon = (Double) h.get("decimalLongitude_interpreted");
+				Long id = Long.parseLong(h.get("_id").toString(), 10);
+
+				response.add(new Marker(lat, lon, id));
 			}
 
 			return ok(Json.toJson(response));
@@ -190,12 +192,21 @@ public class Search extends Controller {
 
 	@With(CorsWrapper.class)
 	public static Result searchOccurrencesTile(double nwLat, double nwLng, double seLat, double seLng) {
-		Integer divider = 10;
+		Integer divider = 4;
 		JsonNode json = request().body().asJson();
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			SearchParser search = mapper.readValue(json.traverse(), SearchParser.class);
 			BoolQueryBuilder baseQuery = Occurrences.buildRequestQuery(search);
+
+			baseQuery
+				.must(QueryBuilders.rangeQuery("decimalLatitude_interpreted")
+					.gte(seLat)
+					.lt(nwLat))
+				.must(QueryBuilders.rangeQuery("decimalLongitude_interpreted")
+					.gte(nwLng)
+					.lt(seLng));
+
 
 			ArrayList<GeoBound> subTiles = new ArrayList<GeoBound>();
 			ArrayList<QueryFacetBuilder> subQueries = new ArrayList<QueryFacetBuilder>();
@@ -224,9 +235,11 @@ public class Search extends Controller {
 			}
 
 			SearchRequestBuilder query = IndexClient.client
-				.prepareSearch("gbiffrance-harvest").setTypes("Occurrence")
+				.prepareSearch(play.Configuration.root().getString("gbif.elasticsearch.index.occurrence"))
+				.setTypes(play.Configuration.root().getString("gbif.elasticsearch.type.occurrence"))
 				.setQuery(baseQuery)
 				.setSearchType(SearchType.COUNT);
+
 			for(QueryFacetBuilder item : subQueries){
 				query.addFacet(item);
 			}
@@ -246,7 +259,8 @@ public class Search extends Controller {
 				}
 			}
 
-			response().setHeader("Access-Control-Expose-Headers", "X-Max-Hits");
+			response().setHeader("Access-Control-Expose-Headers", "X-Map-Divider, X-Max-Hits");
+			response().setHeader("X-Map-Divider", divider + "");
 			response().setHeader("X-Max-Hits", elasticResponse.getHits().totalHits() + "");
 
 			return ok(Json.toJson(response));
