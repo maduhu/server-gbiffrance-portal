@@ -1466,83 +1466,25 @@ public class Occurrence {
 		this.classs_interpreted = classs_interpreted;
 	}
 
-	public String getOrderr_interpreted() {
-		return orderr_interpreted;
-	}
-
-	public void setOrderr_interpreted(String orderr_interpreted) {
-		this.orderr_interpreted = orderr_interpreted;
-	}
-
-	public String getFamily_interpreted() {
-		return family_interpreted;
-	}
-
-	public void setFamily_interpreted(String family_interpreted) {
-		this.family_interpreted = family_interpreted;
-	}
-
-	public String getGenus_interpreted() {
-		return genus_interpreted;
-	}
-
-	public void setGenus_interpreted(String genus_interpreted) {
-		this.genus_interpreted = genus_interpreted;
-	}
-
-	public String getSubgenus_interpreted() {
-		return subgenus_interpreted;
-	}
-
-	public void setSubgenus_interpreted(String subgenus_interpreted) {
-		this.subgenus_interpreted = subgenus_interpreted;
-	}
-
-	public String getSpecificEpithet_interpreted() {
-		return specificEpithet_interpreted;
-	}
-
-	public void setSpecificEpithet_interpreted(String specificEpithet_interpreted) {
-		this.specificEpithet_interpreted = specificEpithet_interpreted;
-	}
-
-	public String getInfraSpecificEpithet_interpreted() {
-		return infraSpecificEpithet_interpreted;
-	}
-
-	public void setInfraSpecificEpithet_interpreted(
-			String infraSpecificEpithet_interpreted) {
-		this.infraSpecificEpithet_interpreted = infraSpecificEpithet_interpreted;
-	}
-
-	public String getTaxonRank() {
-		return taxonRank;
-	}
-
-	public void setTaxonRank(String taxonRank) {
-		this.taxonRank = taxonRank;
-	}
-
-	public String getVerbatimTaxonRank() {
-		return verbatimTaxonRank;
-	}
-
-	public void setVerbatimTaxonRank(String verbatimTaxonRank) {
-		this.verbatimTaxonRank = verbatimTaxonRank;
-	}
-
-	public String getScientificNameAuthorship() {
-		return scientificNameAuthorship;
-	}
-
-	public void setScientificNameAuthorship(String scientificNameAuthorship) {
-		this.scientificNameAuthorship = scientificNameAuthorship;
-	}
-
-	public String getVernacularName() {
-		return vernacularName;
-	}
-
+	public String getOrderr_interpreted() { return orderr_interpreted; }
+	public void setOrderr_interpreted(String orderr_interpreted) { this.orderr_interpreted = orderr_interpreted; }
+	public String getFamily_interpreted() { return family_interpreted; }
+	public void setFamily_interpreted(String family_interpreted) { this.family_interpreted = family_interpreted; }
+	public String getGenus_interpreted() { return genus_interpreted; }
+	public void setGenus_interpreted(String genus_interpreted) { this.genus_interpreted = genus_interpreted; }
+	public String getSubgenus_interpreted() { return subgenus_interpreted; }
+	public void setSubgenus_interpreted(String subgenus_interpreted) { this.subgenus_interpreted = subgenus_interpreted; }
+	public String getSpecificEpithet_interpreted() { return specificEpithet_interpreted; }
+	public void setSpecificEpithet_interpreted(String specificEpithet_interpreted) { this.specificEpithet_interpreted = specificEpithet_interpreted; }
+	public String getInfraSpecificEpithet_interpreted() { return infraSpecificEpithet_interpreted; }
+	public void setInfraSpecificEpithet_interpreted(String infraSpecificEpithet_interpreted) { this.infraSpecificEpithet_interpreted = infraSpecificEpithet_interpreted; }
+	public String getTaxonRank() { return taxonRank; }
+	public void setTaxonRank(String taxonRank) { this.taxonRank = taxonRank; }
+	public String getVerbatimTaxonRank() { return verbatimTaxonRank; }
+	public void setVerbatimTaxonRank(String verbatimTaxonRank) { this.verbatimTaxonRank = verbatimTaxonRank; }
+	public String getScientificNameAuthorship() { return scientificNameAuthorship; }
+	public void setScientificNameAuthorship(String scientificNameAuthorship) { this.scientificNameAuthorship = scientificNameAuthorship; }
+	public String getVernacularName() { return vernacularName; }
 	public void setVernacularName(String vernacularName) { this.vernacularName = vernacularName; }
 	public String getNomenclaturalCode() { return nomenclaturalCode; }
 	public void setNomenclaturalCode(String nomenclaturalCode) { this.nomenclaturalCode = nomenclaturalCode; }

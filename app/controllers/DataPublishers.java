@@ -22,19 +22,18 @@ public class DataPublishers extends Controller {
 	public static Result searchAll() {
 
 		SearchResponse response = IndexClient.client
-				.prepareSearch("gbiffrance-harvest")
-				.setTypes("DataPublisher")
+				.prepareSearch(play.Configuration.root().getString("gbif.elasticsearch.index.datapublisher"))
+				.setTypes(play.Configuration.root().getString("gbif.elasticsearch.type.datapublisher"))
+				.setSize(100)
 				.execute()
 				.actionGet();
 
-		Long nbHits = response.getHits().getTotalHits();
-		System.out.println(nbHits);
 		ArrayList<DataPublisher> dataPublisherList = new ArrayList<DataPublisher>();
 
 		for (SearchHit hit : response.getHits()) {
 			DataPublisher dataPublisher = new DataPublisher();
-			dataPublisher.setId(Long.parseLong((String) hit.getSource()
-					.get("_id")));
+			dataPublisher.setId(Long.parseLong(hit.getSource()
+					.get("_id").toString()));
 			dataPublisher.setClassName((String) hit.getSource()
 					.get("className"));
 			dataPublisher.setName((String) hit.getSource()
@@ -66,7 +65,7 @@ public class DataPublishers extends Controller {
 	public static Result get(String datapublisherId) {
 		System.out.println(datapublisherId);
 		GetResponse response = IndexClient.client
-				.prepareGet("gbiffrance-harvest", "DataPublisher", datapublisherId)
+				.prepareGet(play.Configuration.root().getString("gbif.elasticsearch.index.datapublisher"), play.Configuration.root().getString("gbif.elasticsearch.type.datapublisher"), datapublisherId)
 				.execute().actionGet();
 		return ok(Json.toJson(response.getSource()));
 	}

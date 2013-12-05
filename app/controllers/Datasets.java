@@ -1,6 +1,7 @@
 package controllers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import models.DataPublisher;
@@ -8,11 +9,8 @@ import models.Dataset;
 
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.github.cleverage.elasticsearch.IndexClient;
 
 import play.libs.Json;
@@ -22,11 +20,13 @@ import play.mvc.With;
 
 public class Datasets extends Controller{
 	
+
+	
 	@SuppressWarnings("unchecked")
 	private static Dataset createJson(SearchHit hit){
 		Dataset dataset = new Dataset();
-		dataset.setId(Long.parseLong((String) hit.getSource()
-				.get("_id")));
+		dataset.setId(Long.parseLong((hit.getSource()
+				.get("id")).toString()));
 		dataset.setClassName((String) hit.getSource()
 				.get("className"));
 		dataset.setName((String) hit.getSource()
@@ -49,8 +49,11 @@ public class Datasets extends Controller{
 				.get("tagsText"));
 		dataset.setTags((ArrayList<String>) hit.getSource()
 				.get("tags"));
-		dataset.setDataPublisher(new DataPublisher(Long.parseLong((String) hit.getSource()
-				.get("dataPublisherId"))));
+		
+		@SuppressWarnings("rawtypes")
+		HashMap dataPublisher = (HashMap) hit.getSource()
+				.get("dataPublisher");
+		dataset.setDataPublisher(new DataPublisher(Long.parseLong(dataPublisher.get("$id").toString())));
 		return dataset;
 	}
 	
@@ -58,8 +61,9 @@ public class Datasets extends Controller{
 	public static Result getAll() {
 
 		SearchResponse response = IndexClient.client
-				.prepareSearch("gbiffrance-harvest")
-				.setTypes("Dataset")
+				.prepareSearch(play.Configuration.root().getString("gbif.elasticsearch.index.dataset"))
+				.setTypes(play.Configuration.root().getString("gbif.elasticsearch.type.dataset"))
+				.setSize(100)
 				.execute()
 				.actionGet();
 		
@@ -80,7 +84,7 @@ public class Datasets extends Controller{
 	public static Result get(String datasetId) {
 		System.out.println(datasetId);
 		GetResponse response = IndexClient.client
-				.prepareGet("gbiffrance-harvest", "Dataset", datasetId)
+				.prepareGet(play.Configuration.root().getString("gbif.elasticsearch.index.dataset"), play.Configuration.root().getString("gbif.elasticsearch.type.dataset"), datasetId)
 				.execute().actionGet();
 		return ok(Json.toJson(response.getSource()));
 	}

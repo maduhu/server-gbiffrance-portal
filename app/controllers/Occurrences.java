@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import models.Dataset;
 import models.Occurrence;
 
+import org.elasticsearch.action.count.CountResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolFilterBuilder;
@@ -142,15 +143,17 @@ public class Occurrences extends Controller {
 		occurrence.setSex((String) hit.getSource()
 				.get("sex"));
 		occurrence.setDataset(new Dataset(Long.parseLong((String) hit.getSource()
-				.get("datasetId"))));
+				.get("dataset.id"))));
 		occurrence.setYear_interpreted((Integer) hit.getSource()
 				.get("year_interpreted"));
 		return occurrence;
 	}
 	private static Occurrence createJsonListOccurrence(SearchHit hit){
 		Occurrence occurrence = new Occurrence();
-		occurrence.setId(Long.parseLong((String) hit.getSource()
-				.get("_id")));
+		System.out.println(hit.getSource()
+				.get("_id").getClass());
+		occurrence.setId(Long.parseLong(hit.getSource()
+				.get("_id").toString()));
 		occurrence.setDatasetName((String) hit.getSource()
 				.get("datasetName"));
 		occurrence.setBasisOfRecord((String) hit.getSource()
@@ -190,13 +193,15 @@ public class Occurrences extends Controller {
 	 */
 	public static Result searchAllOccurrences() {
 		SearchResponse response = IndexClient.client
-				.prepareSearch("gbiffrance-harvest").setTypes("Occurrence")
+				.prepareSearch("").setTypes("Occurrence")
 				.execute().actionGet();
 		ArrayList<Occurrence> occurrenceList = new ArrayList<Occurrence>();
 		for (SearchHit hit : response.getHits())
 			occurrenceList.add(createJson(hit));
 		return ok(Json.toJson(occurrenceList));
 	}
+	
+
 	
 	public static BoolQueryBuilder buildRequestQuery(SearchParser search){
 		
@@ -369,7 +374,7 @@ public class Occurrences extends Controller {
 		BoolFilterBuilder searchFilter = buildRequestFilter(search);
 		
 		response = IndexClient.client
-				.prepareSearch("gbiffrance-harvest").setTypes("Occurrence")
+				.prepareSearch(play.Configuration.root().getString("gbif.elasticsearch.index.occurrence")).setTypes(play.Configuration.root().getString("gbif.elasticsearch.type.occurrence"))
 				.setQuery(searchQuery)
 				.setFilter(searchFilter)
 				.setSize(size)
@@ -393,8 +398,9 @@ public class Occurrences extends Controller {
 	public static Result get(String occurrenceId) {
 		System.out.println(occurrenceId);
 		GetResponse response = IndexClient.client
-				.prepareGet("gbiffrance-harvest", "Occurrence", occurrenceId)
+				.prepareGet(play.Configuration.root().getString("gbif.elasticsearch.index.occurrence"), play.Configuration.root().getString("gbif.elasticsearch.type.occurrence"), occurrenceId)
 				.execute().actionGet();
+		System.out.println(response.getSource().get("dataset.$id"));
 		return ok(Json.toJson(response.getSource()));
 	}
 	
@@ -439,7 +445,7 @@ public class Occurrences extends Controller {
 		HistogramFacetBuilder dateFacet = statDate(search, searchFilter);
 		
 		response = IndexClient.client
-				.prepareSearch("gbiffrance-harvest").setTypes("Occurrence")
+				.prepareSearch(play.Configuration.root().getString("gbif.elasticsearch.index.occurrence")).setTypes(play.Configuration.root().getString("gbif.elasticsearch.type.occurrence"))
 				.setQuery(searchQuery)
 				.setFilter(searchFilter)
 				.addFacet(taxaFacet)
@@ -454,7 +460,7 @@ public class Occurrences extends Controller {
 
 		for (TermsFacet.Entry entry : resultFacetTaxa){
 			SearchResponse getScientificName = IndexClient.client
-												.prepareSearch("gbiffrance-harvest").setTypes("Occurrence")
+												.prepareSearch(play.Configuration.root().getString("gbif.elasticsearch.index.occurrence")).setTypes(play.Configuration.root().getString("gbif.elasticsearch.type.occurrence"))
 												.setQuery(QueryBuilders.matchQuery("ecatConceptId", entry.getTerm().string()))
 												.setSize(1)
 												.execute().actionGet();								
@@ -463,7 +469,7 @@ public class Occurrences extends Controller {
 		
 		for (TermsFacet.Entry entry : resultFacetDataset){
 			GetResponse getDataset = IndexClient.client
-					.prepareGet("gbiffrance-harvest", "Dataset", entry.getTerm().string())
+					.prepareGet(play.Configuration.root().getString("gbif.elasticsearch.index.dataset"), play.Configuration.root().getString("gbif.elasticsearch.type.dataset"), entry.getTerm().string())
 					.execute().actionGet();							
 			statList.add(createJsonStatistic(entry.getTerm().string(), entry.getCount(), "dataset", getDataset.getSource().get("title").toString()));
 		}

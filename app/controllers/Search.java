@@ -269,7 +269,7 @@ public class Search extends Controller {
 		try { 
 			SearchParser search = mapper.readValue(json.traverse(), SearchParser.class);
 			JsonNode jsonResult = Occurrences.statisticOccurrence(search);
-
+			
 			return ok(jsonResult);
 		} catch (JsonGenerationException e) {
 			e.printStackTrace();
