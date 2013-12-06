@@ -59,6 +59,7 @@ public class Occurrence {
 	private String associatedOccurrences;
 	private String associatedSequences;
 	private String associatedTaxa;
+	private String datasetId;
 
 	// Event
 	private String eventID;
@@ -1464,6 +1465,16 @@ public class Occurrence {
 
 	public void setClasss_interpreted(String classs_interpreted) {
 		this.classs_interpreted = classs_interpreted;
+	}
+	
+	
+
+	public String getDatasetId() {
+		return datasetId;
+	}
+
+	public void setDatasetId(String datasetId) {
+		this.datasetId = datasetId;
 	}
 
 	public String getOrderr_interpreted() { return orderr_interpreted; }

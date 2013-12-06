@@ -61,7 +61,7 @@ public class Occurrences extends Controller {
 		String delims = "\"";
 		String[] tokens = str.split(delims);
 		String datasetId = tokens[7];
-		occurrence.setDataset(new Dataset(Long.parseLong(datasetId)));
+		occurrence.setDatasetId(datasetId);
 		if(map.get("datasetName")==null){
 			GetResponse response = IndexClient.client
 					.prepareGet(play.Configuration.root().getString("gbif.elasticsearch.index.dataset"), 
@@ -123,8 +123,8 @@ public class Occurrences extends Controller {
 		occurrence.setOccurrenceRemarks((String)map.get("occurrenceRemarks"));
 		occurrence.setRecordedBy((String)map.get("recordedBy"));
 		occurrence.setSex((String)map.get("sex"));
-		if(map.get("year_interpreted")!=null)
-			occurrence.setYear_interpreted(Integer.parseInt((String)map.get("year_interpreted")));
+		if((Integer)map.get("year_interpreted")!=null)
+			occurrence.setYear_interpreted((Integer)map.get("year_interpreted"));
 		return occurrence;
 	}
 	private static Occurrence createJson(SearchHit hit){
@@ -383,7 +383,7 @@ public class Occurrences extends Controller {
 			for(int i=0; i< search.getDataset().size(); ++i){
 				datasetQuery = datasetQuery
 //									.should(QueryBuilders.matchQuery("dataset.$id", search.getDataset().get(i)));
-									.should(QueryBuilders.matchQuery("datasetId", search.getDataset().get(i)));
+									.should(QueryBuilders.matchQuery("dataset", search.getDataset().get(i)));
 			}
 		}
 		
@@ -520,9 +520,9 @@ public class Occurrences extends Controller {
 		GetResponse response = IndexClient.client
 				.prepareGet(play.Configuration.root().getString("gbif.elasticsearch.index.occurrence"), play.Configuration.root().getString("gbif.elasticsearch.type.occurrence"), occurrenceId)
 				.execute().actionGet();
-		if(response.getSource().get("datasetName")==null || response.getSource().get("basisOfRecord")==null)
+		//if(response.getSource().get("datasetName")==null || response.getSource().get("basisOfRecord")==null)
 			return ok(Json.toJson(createJsonOccurrence(response.getSource())));
-		return ok(Json.toJson(response.getSource()));
+		//return ok(Json.toJson(response.getSource()));
 	}
 	
 	public static TermsFacetBuilder statTaxon (SearchParser search, BoolFilterBuilder searchFilter){
