@@ -13,11 +13,16 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.BaseQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.facet.Facet;
 import org.elasticsearch.search.facet.FacetBuilders;
 import org.elasticsearch.search.facet.query.QueryFacet;
 import org.elasticsearch.search.facet.terms.TermsFacet;
+import org.elasticsearch.search.facet.filter.FilterFacet;
+
+import org.elasticsearch.index.query.FilterBuilders;
+import static org.elasticsearch.index.query.FilterBuilders.existsFilter;
 
 import com.github.cleverage.elasticsearch.IndexClient;
 
@@ -95,31 +100,51 @@ public class Datasets extends Controller{
 				.execute().actionGet();
 		return ok(Json.toJson(response.getSource()));
 	}
-	
-	@With(CorsWrapper.class)
-	public static Result getStatistics(String datasetId) {
-		Map<String, Integer> result = new HashMap();
-		
+
+	protected static Result getStatisticsQuery(BaseQueryBuilder q) {
+		Map<String, Long> result = new HashMap();
+
 		SearchRequestBuilder query =  IndexClient.client
 				.prepareSearch(play.Configuration.root().getString("gbif.elasticsearch.index.occurrence"))
 				.setTypes(play.Configuration.root().getString("gbif.elasticsearch.type.occurrence"))
-				.setQuery(QueryBuilders.matchQuery("dataset", datasetId))
+				.setQuery(q)
 				.setSearchType(SearchType.COUNT)
 				.addFacet(FacetBuilders.termsFacet("kingdom")
-					    .field("kingdom_interpreted")
-					    .size(10));
+					.field("kingdom_interpreted")
+					.size(10))
+				.addFacet(FacetBuilders.filterFacet("georeferenced",
+					FilterBuilders.boolFilter()
+						.must(existsFilter("decimalLatitude_interpreted"))
+						.must(existsFilter("decimalLongitude_interpreted"))
+					));
 		
 		System.out.println(query);
 
 		SearchResponse response = query.execute().actionGet();
-		
-		TermsFacet facets = (TermsFacet)response.getFacets().facetsAsMap().get("kingdom");
-		
-		for(TermsFacet.Entry e : facets) {
-			result.put(e.getTerm().string(), e.getCount());
+
+		TermsFacet kingdomFacets = (TermsFacet) response.getFacets().facetsAsMap().get("kingdom");
+		FilterFacet geoReferencedFacets = (FilterFacet) response.getFacets().facetsAsMap().get("georeferenced");
+
+		for(TermsFacet.Entry e : kingdomFacets) {
+			result.put(e.getTerm().string(), new Long(e.getCount()));
 		}
 
+		result.put("georeferenced", geoReferencedFacets.getCount());
+		result.put("total", response.getHits().getTotalHits());
+
 		return ok(Json.toJson(result));
+
+	}
+
+
+	@With(CorsWrapper.class)
+	public static Result getStatistics(Long datasetId) {
+		return getStatisticsQuery(QueryBuilders.matchQuery("dataset", datasetId.toString()));
+	}
+
+	@With(CorsWrapper.class)
+	public static Result getAllStatistics() {
+		return getStatisticsQuery(QueryBuilders.matchAllQuery());
 	}
 
 

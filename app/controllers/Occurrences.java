@@ -255,6 +255,7 @@ public class Occurrences extends Controller {
 				.get("year_interpreted"));
 		return occurrence;
 	}
+
 	private static Occurrence createJsonListOccurrence(SearchHit hit){
 		Occurrence occurrence = new Occurrence();
 		occurrence.setId(Long.parseLong(hit.getSource()
