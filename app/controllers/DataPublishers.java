@@ -18,7 +18,6 @@ import play.mvc.With;
 
 public class DataPublishers extends Controller {
 
-	@SuppressWarnings("unchecked")
 	@With(CorsWrapper.class)
 	public static Result searchAll() {
 
@@ -57,6 +56,7 @@ public class DataPublishers extends Controller {
 		return ok(Json.toJson(dataPublisherList));
 	}
 	
+	
 	/**
 	 * Fonction qui lance la requete sur ElasticSearch
 	 * @param search
@@ -64,7 +64,6 @@ public class DataPublishers extends Controller {
 	 */
 	@With(CorsWrapper.class)
 	public static Result get(Long datapublisherId) {
-		System.out.println(datapublisherId);
 		GetResponse response = IndexClient.client
 				.prepareGet(play.Configuration.root().getString("gbif.elasticsearch.index.datapublisher"), play.Configuration.root().getString("gbif.elasticsearch.type.datapublisher"), datapublisherId.toString())
 				.execute().actionGet();

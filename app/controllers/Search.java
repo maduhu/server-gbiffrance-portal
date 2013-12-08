@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -276,6 +277,7 @@ public class Search extends Controller {
 		return internalServerError("Oops");
 	}
 
+	
 	@With(CorsWrapper.class)
 	public static Result getSearchStatistic(){
 		JsonNode json = request().body().asJson();

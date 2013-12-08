@@ -135,8 +135,8 @@ public class Occurrences extends Controller {
 		occurrence.setOccurrenceRemarks((String)map.get("occurrenceRemarks"));
 		occurrence.setRecordedBy((String)map.get("recordedBy"));
 		occurrence.setSex((String)map.get("sex"));
-		if(map.get("year_interpreted")!=null)
-			occurrence.setYear_interpreted(Integer.parseInt(map.get("year_interpreted").toString()));
+		if((Integer)map.get("year_interpreted")!=null)
+			occurrence.setYear_interpreted((Integer)map.get("year_interpreted"));
 		return occurrence;
 	}
 	private static Occurrence createJson(SearchHit hit){
@@ -492,7 +492,7 @@ public class Occurrences extends Controller {
 	 * @return
 	 */
 	public static JsonNode searchOccurrences(SearchParser search) {
-		return searchOccurrences(search, 0, 20);
+		return searchOccurrences(search, 0, 10);
 	}
 
 	public static JsonNode searchOccurrences(SearchParser search, Integer page, Integer size) {
@@ -613,5 +613,7 @@ public class Occurrences extends Controller {
 		
 		return Json.toJson(statList);
 	}
+	
+
 
 }
