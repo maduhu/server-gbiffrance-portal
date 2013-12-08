@@ -7,6 +7,7 @@ import models.DataPublisher;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.sort.SortOrder;
 
 import com.github.cleverage.elasticsearch.IndexClient;
 
@@ -24,6 +25,7 @@ public class DataPublishers extends Controller {
 		SearchResponse response = IndexClient.client
 				.prepareSearch(play.Configuration.root().getString("gbif.elasticsearch.index.datapublisher"))
 				.setTypes(play.Configuration.root().getString("gbif.elasticsearch.type.datapublisher"))
+				.addSort("name", SortOrder.ASC)
 				.setSize(100)
 				.execute()
 				.actionGet();

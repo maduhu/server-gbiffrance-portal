@@ -59,6 +59,7 @@ public class Occurrence {
 	private String associatedOccurrences;
 	private String associatedSequences;
 	private String associatedTaxa;
+	private String datasetId;
 
 	// Event
 	private String eventID;
@@ -207,7 +208,7 @@ public class Occurrence {
 	private String taxonStatus;
 	private String ecatConceptId;
 	private String ecatParentId;
-
+	private String datapublisherName;
 	/**
 	 * Hit score get by the occurrence during a search
 	 */
@@ -1465,6 +1466,16 @@ public class Occurrence {
 	public void setClasss_interpreted(String classs_interpreted) {
 		this.classs_interpreted = classs_interpreted;
 	}
+	
+	
+
+	public String getDatasetId() {
+		return datasetId;
+	}
+
+	public void setDatasetId(String datasetId) {
+		this.datasetId = datasetId;
+	}
 
 	public String getOrderr_interpreted() { return orderr_interpreted; }
 	public void setOrderr_interpreted(String orderr_interpreted) { this.orderr_interpreted = orderr_interpreted; }
@@ -1505,5 +1516,8 @@ public class Occurrence {
 	public Dataset getDataset() { return dataset; }
 	public void setDataset(Dataset dataset) { this.dataset = dataset; }
 	public Integer getYear_interpreted() { return year_interpreted; }
-	public void setYear_interpreted(Integer year_interpreted) { this.year_interpreted = year_interpreted; }  
+	public void setYear_interpreted(Integer year_interpreted) { this.year_interpreted = year_interpreted; }
+	public String getDatapublisherName() { return datapublisherName; }
+	public void setDatapublisherName(String datapublisherName) { this.datapublisherName = datapublisherName; }  
+	
 }
