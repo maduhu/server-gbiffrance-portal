@@ -494,7 +494,7 @@ public class Occurrences extends Controller {
 	 * @return
 	 */
 	public static JsonNode searchOccurrences(SearchParser search) {
-		return searchOccurrences(search, 0, 10);
+		return searchOccurrences(search, 0, 20);
 	}
 
 	public static JsonNode searchOccurrences(SearchParser search, Integer page, Integer size) {
