@@ -1,6 +1,7 @@
 package controllers;
 
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
 
 import models.DataPublisher;
 
@@ -15,10 +16,13 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.With;
+import play.cache.Cache;
+import play.cache.Cached;
 
 public class DataPublishers extends Controller {
 
 	@With(CorsWrapper.class)
+	@Cached(key = "/datapublishers/")
 	public static Result searchAll() {
 
 		SearchResponse response = IndexClient.client
@@ -56,18 +60,27 @@ public class DataPublishers extends Controller {
 		return ok(Json.toJson(dataPublisherList));
 	}
 	
-	
-	/**
-	 * Fonction qui lance la requete sur ElasticSearch
-	 * @param search
-	 * @return
-	 */
 	@With(CorsWrapper.class)
 	public static Result get(Long datapublisherId) {
-		GetResponse response = IndexClient.client
-				.prepareGet(play.Configuration.root().getString("gbif.elasticsearch.index.datapublisher"), play.Configuration.root().getString("gbif.elasticsearch.type.datapublisher"), datapublisherId.toString())
-				.execute().actionGet();
-		return ok(Json.toJson(response.getSource()));
+		final Long dpId = datapublisherId;
+
+		try {
+
+			Callable<Result> get = new Callable<Result>() {
+				@Override
+				public Result call() throws Exception {
+					GetResponse response = IndexClient.client
+							.prepareGet(play.Configuration.root().getString("gbif.elasticsearch.index.datapublisher"), play.Configuration.root().getString("gbif.elasticsearch.type.datapublisher"), dpId.toString())
+							.execute().actionGet();
+					return ok(Json.toJson(response.getSource()));
+				}
+			};
+
+			return Cache.getOrElse("/datapublisher/"+datapublisherId, get, 3600*24);
+		} catch (Exception e) {
+			return internalServerError();
+		}
+
 	}
 
 }
