@@ -4,6 +4,7 @@ package controllers;
 import static org.elasticsearch.index.query.FilterBuilders.existsFilter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import models.Dataset;
@@ -62,11 +63,22 @@ public class Occurrences extends Controller {
 		String[] tokens = str.split(delims);
 		String datasetId = tokens[7];
 		occurrence.setDatasetId(datasetId);
+		GetResponse response = IndexClient.client
+				.prepareGet(play.Configuration.root().getString("gbif.elasticsearch.index.dataset"), 
+						play.Configuration.root().getString("gbif.elasticsearch.type.dataset"), datasetId)
+						.execute().actionGet();
+	
+		HashMap dataPublisher = (HashMap) response.getSource()
+				.get("dataPublisher");
+		
+		GetResponse responseDatapublisher = IndexClient.client
+				.prepareGet(play.Configuration.root().getString("gbif.elasticsearch.index.datapublisher"), 
+						play.Configuration.root().getString("gbif.elasticsearch.type.datapublisher"), dataPublisher.get("$id").toString())
+						.execute().actionGet();
+		
+		occurrence.setDatapublisherName(responseDatapublisher.getSource().get("name").toString());
+		
 		if(map.get("datasetName")==null){
-			GetResponse response = IndexClient.client
-					.prepareGet(play.Configuration.root().getString("gbif.elasticsearch.index.dataset"), 
-							play.Configuration.root().getString("gbif.elasticsearch.type.dataset"), datasetId)
-							.execute().actionGet();
 			occurrence.setDatasetName((String)response.getSource().get("name"));
 		}else{
 			occurrence.setDatasetName((String)map.get("datasetName"));
@@ -325,6 +337,7 @@ public class Occurrences extends Controller {
 		BoolQueryBuilder datasetQuery = QueryBuilders.boolQuery();
 		BoolQueryBuilder finalQuery = new BoolQueryBuilder();
 		BoolQueryBuilder geoQuery = QueryBuilders.boolQuery();
+		finalQuery = QueryBuilders.boolQuery();
 		
 		if(search.getScientificNames()!= null){
 			for(int i=0; i< search.getScientificNames().size(); ++i){
@@ -377,6 +390,7 @@ public class Occurrences extends Controller {
 						break;
 				}
 			}
+			finalQuery = finalQuery.must(taxaQuery);
 		}
 		
 		if(search.getDataset() != null){
@@ -385,7 +399,8 @@ public class Occurrences extends Controller {
 //									.should(QueryBuilders.matchQuery("dataset.$id", search.getDataset().get(i)));
 									.should(QueryBuilders.matchQuery("dataset", search.getDataset().get(i)));
 			}
-		}
+			finalQuery = finalQuery.must(datasetQuery)
+;		}
 		
 		if(search.getLatitude()!=null || search.getLongitude() != null || search.getLocalities() != null || search.getBoundingBox() !=null){
 			
@@ -444,13 +459,10 @@ public class Occurrences extends Controller {
 										.lt(search.getLocalities().get(i).getBounds()[3])));
 				}
 			}
+			finalQuery = finalQuery.must(geoQuery);
 		}
 		
-		finalQuery = QueryBuilders.boolQuery()
-						.must(taxaQuery)
-						.must(datasetQuery)
-						.must(geoQuery);
-		
+
 		return finalQuery;		
 	}
 	
@@ -520,9 +532,9 @@ public class Occurrences extends Controller {
 		GetResponse response = IndexClient.client
 				.prepareGet(play.Configuration.root().getString("gbif.elasticsearch.index.occurrence"), play.Configuration.root().getString("gbif.elasticsearch.type.occurrence"), occurrenceId)
 				.execute().actionGet();
-		//if(response.getSource().get("datasetName")==null || response.getSource().get("basisOfRecord")==null)
-			return ok(Json.toJson(createJsonOccurrence(response.getSource())));
-		//return ok(Json.toJson(response.getSource()));
+		
+		return ok(Json.toJson(createJsonOccurrence(response.getSource())));
+
 	}
 	
 	public static TermsFacetBuilder statTaxon (SearchParser search, BoolFilterBuilder searchFilter){

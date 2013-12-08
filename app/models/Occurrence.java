@@ -208,7 +208,7 @@ public class Occurrence {
 	private String taxonStatus;
 	private String ecatConceptId;
 	private String ecatParentId;
-
+	private String datapublisherName;
 	/**
 	 * Hit score get by the occurrence during a search
 	 */
@@ -1516,5 +1516,8 @@ public class Occurrence {
 	public Dataset getDataset() { return dataset; }
 	public void setDataset(Dataset dataset) { this.dataset = dataset; }
 	public Integer getYear_interpreted() { return year_interpreted; }
-	public void setYear_interpreted(Integer year_interpreted) { this.year_interpreted = year_interpreted; }  
+	public void setYear_interpreted(Integer year_interpreted) { this.year_interpreted = year_interpreted; }
+	public String getDatapublisherName() { return datapublisherName; }
+	public void setDatapublisherName(String datapublisherName) { this.datapublisherName = datapublisherName; }  
+	
 }
