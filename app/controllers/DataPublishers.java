@@ -63,10 +63,10 @@ public class DataPublishers extends Controller {
 	 * @return
 	 */
 	@With(CorsWrapper.class)
-	public static Result get(String datapublisherId) {
+	public static Result get(Long datapublisherId) {
 		System.out.println(datapublisherId);
 		GetResponse response = IndexClient.client
-				.prepareGet(play.Configuration.root().getString("gbif.elasticsearch.index.datapublisher"), play.Configuration.root().getString("gbif.elasticsearch.type.datapublisher"), datapublisherId)
+				.prepareGet(play.Configuration.root().getString("gbif.elasticsearch.index.datapublisher"), play.Configuration.root().getString("gbif.elasticsearch.type.datapublisher"), datapublisherId.toString())
 				.execute().actionGet();
 		return ok(Json.toJson(response.getSource()));
 	}
