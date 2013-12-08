@@ -32,8 +32,7 @@ public class DataPublishers extends Controller {
 
 		for (SearchHit hit : response.getHits()) {
 			DataPublisher dataPublisher = new DataPublisher();
-			dataPublisher.setId(Long.parseLong(hit.getSource()
-					.get("_id").toString()));
+			dataPublisher.setId(Long.parseLong(hit.getId()));
 			dataPublisher.setClassName((String) hit.getSource()
 					.get("className"));
 			dataPublisher.setName((String) hit.getSource()
