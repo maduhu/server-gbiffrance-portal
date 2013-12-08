@@ -58,6 +58,10 @@ public class DataPublisher {
 	 * the data publisher image URL
 	 */
 	private String imageURL;
+	private String uuid;
+	
+	private String phone;
+	private String email;
 	
 	public DataPublisher(Long id){ this.id = id; }
 	public DataPublisher() {}
@@ -89,4 +93,10 @@ public class DataPublisher {
 	public void setType(String type) { this.type = type; }
 	public String getTown() { return town; }
 	public void setTown(String town) { this.town = town; }
+	public String getUuid() { return uuid; }
+	public void setUuid(String uuid) { this.uuid = uuid; }
+	public String getPhone() { return phone; }
+	public void setPhone(String phone) { this.phone = phone; }
+	public String getEmail() { return email; }
+	public void setEmail(String email) { this.email = email; }
 }

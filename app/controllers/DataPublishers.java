@@ -45,12 +45,12 @@ public class DataPublishers extends Controller {
 					.get("administrativeContact"));
 			dataPublisher.setTechnicalContact((String) hit.getSource()
 					.get("technicalContact"));
-			dataPublisher.setTags((ArrayList<String>) hit.getSource()
-					.get("tags"));
-			dataPublisher.setType((String) hit.getSource()
-					.get("type"));
-			dataPublisher.setTown((String) hit.getSource()
-					.get("town"));
+			dataPublisher.setEmail((String) hit.getSource()
+					.get("email"));
+			dataPublisher.setPhone((String) hit.getSource()
+					.get("phone"));
+			dataPublisher.setUuid((String) hit.getSource()
+					.get("uuid"));
 			dataPublisherList.add(dataPublisher);
 		}
 		
