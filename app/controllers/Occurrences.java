@@ -6,6 +6,7 @@ import static org.elasticsearch.index.query.FilterBuilders.existsFilter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import models.Dataset;
 import models.Occurrence;
@@ -28,6 +29,8 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.With;
+import play.cache.Cache;
+import play.cache.Cached;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.cleverage.elasticsearch.IndexClient;
@@ -54,7 +57,7 @@ public class Occurrences extends Controller {
 		public String getName() { return name; }
 		public void setName(String name) { this.name = name; }
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	private static Occurrence createJsonOccurrence(Map map){
 		Occurrence occurrence = new Occurrence();
@@ -139,6 +142,8 @@ public class Occurrences extends Controller {
 			occurrence.setYear_interpreted((Integer)map.get("year_interpreted"));
 		return occurrence;
 	}
+
+
 	private static Occurrence createJson(SearchHit hit){
 		Occurrence occurrence = new Occurrence();
 		
@@ -314,11 +319,7 @@ public class Occurrences extends Controller {
 		statisticParser.setName(name);
 		return statisticParser;
 	}
-	
-	/**
-	 * Function that return all the occurrence documents stored in our ElasticSearch 
-	 * @return result JSON
-	 */
+
 	public static Result searchAllOccurrences() {
 		SearchResponse response = IndexClient.client
 				.prepareSearch(play.Configuration.root().getString("gbif.elasticsearch.index.occurrence"))
@@ -498,7 +499,7 @@ public class Occurrences extends Controller {
 	 * @return
 	 */
 	public static JsonNode searchOccurrences(SearchParser search) {
-		return searchOccurrences(search, 0, 10);
+		return searchOccurrences(search, 0, 20);
 	}
 
 	public static JsonNode searchOccurrences(SearchParser search, Integer page, Integer size) {
@@ -534,15 +535,30 @@ public class Occurrences extends Controller {
 	 */
 	@With(CorsWrapper.class)
 	public static Result get(String occurrenceId) {
-		System.out.println(occurrenceId);
-		GetResponse response = IndexClient.client
-				.prepareGet(play.Configuration.root().getString("gbif.elasticsearch.index.occurrence"), play.Configuration.root().getString("gbif.elasticsearch.type.occurrence"), occurrenceId)
-				.execute().actionGet();
-		
-		return ok(Json.toJson(createJsonOccurrence(response.getSource())));
+		final String oId = occurrenceId;
+
+		try {
+
+			Callable<Result> get = new Callable<Result>() {
+				@Override
+				public Result call() throws Exception {
+
+					GetResponse response = IndexClient.client
+							.prepareGet(play.Configuration.root().getString("gbif.elasticsearch.index.occurrence"), play.Configuration.root().getString("gbif.elasticsearch.type.occurrence"), oId)
+							.execute().actionGet();
+
+					return ok(Json.toJson(createJsonOccurrence(response.getSource())));
+
+				}
+			};
+
+			return Cache.getOrElse("/occurrence/"+occurrenceId, get, 3600*24);
+		} catch (Exception e) {
+			return internalServerError();
+		}
 
 	}
-	
+
 	public static TermsFacetBuilder statTaxon (SearchParser search, BoolFilterBuilder searchFilter){
 	
 		TermsFacetBuilder canonicalNameFacet = new TermsFacetBuilder("ecatConceptId").size(20);

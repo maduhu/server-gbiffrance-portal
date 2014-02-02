@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import java.util.concurrent.Callable;
+
 import models.DataPublisher;
 import models.Dataset;
 
@@ -30,6 +32,8 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.With;
+import play.cache.Cache;
+import play.cache.Cached;
 
 public class Datasets extends Controller{
 	
@@ -71,8 +75,8 @@ public class Datasets extends Controller{
 	}
 	
 	@With(CorsWrapper.class)
+	@Cached(key = "/dataset/")
 	public static Result getAll() {
-
 		SearchResponse response = IndexClient.client
 				.prepareSearch(play.Configuration.root().getString("gbif.elasticsearch.index.dataset"))
 				.setTypes(play.Configuration.root().getString("gbif.elasticsearch.type.dataset"))
@@ -87,18 +91,27 @@ public class Datasets extends Controller{
 		
 		return ok(Json.toJson(datasetList));
 	}
-	
-	/**
-	 * Fonction qui lance la requete sur ElasticSearch
-	 * @param search
-	 * @return
-	 */
+
 	@With(CorsWrapper.class)
 	public static Result get(String datasetId) {
-		GetResponse response = IndexClient.client
-				.prepareGet(play.Configuration.root().getString("gbif.elasticsearch.index.dataset"), play.Configuration.root().getString("gbif.elasticsearch.type.dataset"), datasetId)
-				.execute().actionGet();
-		return ok(Json.toJson(response.getSource()));
+		final String dId = datasetId;
+
+		try {
+
+			Callable<Result> get = new Callable<Result>() {
+				@Override
+				public Result call() throws Exception {
+					GetResponse response = IndexClient.client
+							.prepareGet(play.Configuration.root().getString("gbif.elasticsearch.index.dataset"), play.Configuration.root().getString("gbif.elasticsearch.type.dataset"), dId)
+							.execute().actionGet();
+					return ok(Json.toJson(response.getSource()));
+				}
+			};
+
+			return Cache.getOrElse("/dataset/"+datasetId, get, 3600*24);
+		} catch (Exception e) {
+			return internalServerError();
+		}
 	}
 
 	protected static Result getStatisticsQuery(BaseQueryBuilder q) {
@@ -139,10 +152,26 @@ public class Datasets extends Controller{
 
 	@With(CorsWrapper.class)
 	public static Result getStatistics(Long datasetId) {
-		return getStatisticsQuery(QueryBuilders.matchQuery("dataset", datasetId.toString()));
+		final Long dId = datasetId;
+
+		try {
+
+			Callable<Result> get = new Callable<Result>() {
+				@Override
+				public Result call() throws Exception {
+					return getStatisticsQuery(QueryBuilders.matchQuery("dataset", dId.toString()));
+				}
+			};
+
+			return Cache.getOrElse("/dataset/"+datasetId+"/statistics", get, 3600*24);
+		} catch (Exception e) {
+			return internalServerError();
+		}
+
 	}
 
 	@With(CorsWrapper.class)
+	@Cached(key = "/dataset/statistics")
 	public static Result getAllStatistics() {
 		return getStatisticsQuery(QueryBuilders.matchAllQuery());
 	}
