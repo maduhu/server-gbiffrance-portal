@@ -38,7 +38,7 @@ import com.github.cleverage.elasticsearch.IndexClient;
 public class Occurrences extends Controller {
 	
 	private enum Rank {
-		KINGDOM, PHYLUM, CLASS, ORDER, FAMILY, GENUS, SPECIES, SUBSPECIES, NO_RANK
+		KINGDOM, PHYLUM, CLASS, ORDER, FAMILY, GENUS, SPECIES, SUBSPECIES
 	}
 	
 	public static class StatisticParser{
@@ -381,11 +381,6 @@ public class Occurrences extends Controller {
 										.should(QueryBuilders.matchQuery("specificEpithet_interpreted", search.getScientificNames().get(i).getScientificName()).type(Type.PHRASE_PREFIX).analyzer("simple"));
 						break;
 					case SUBSPECIES:
-						taxaQuery = taxaQuery
-										.should((QueryBuilders.matchQuery("scientificName", search.getScientificNames().get(i).getScientificName())).type(Type.PHRASE_PREFIX).analyzer("simple"))
-										.should(QueryBuilders.matchQuery("specificEpithet_interpreted", search.getScientificNames().get(i).getScientificName()).type(Type.PHRASE_PREFIX).analyzer("simple"));
-						break;
-					case NO_RANK:
 						taxaQuery = taxaQuery
 										.should((QueryBuilders.matchQuery("scientificName", search.getScientificNames().get(i).getScientificName())).type(Type.PHRASE_PREFIX).analyzer("simple"))
 										.should(QueryBuilders.matchQuery("specificEpithet_interpreted", search.getScientificNames().get(i).getScientificName()).type(Type.PHRASE_PREFIX).analyzer("simple"));
