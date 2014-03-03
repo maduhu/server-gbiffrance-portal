@@ -631,6 +631,6 @@ public class Occurrences extends Controller {
 		return Json.toJson(statList);
 	}
 	
-
-
 }
+
+
